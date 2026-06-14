@@ -569,6 +569,8 @@ input[type="color"] {
   justify-content: center;
 }
 
+.preview-overlay[hidden] { display: none; }
+
 .preview-box {
   background: #f4f5f7;
   border-radius: 16px;
