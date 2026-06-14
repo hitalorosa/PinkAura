@@ -1,8 +1,22 @@
 /* =============================================
-   CONFIGURAÇÕES — trocar antes de publicar
+   CONFIGURAÇÕES — gerenciadas pelo painel admin
    ============================================= */
-const WHATSAPP_NUMBER = "5511999999999"; // TROCAR: somente números, sem espaços ou traços
-const BRAND_NAME      = "Sua Marca";     // TROCAR: nome da sua empresa
+const _cfg = JSON.parse(localStorage.getItem('pinkAura_config') || '{}');
+const WHATSAPP_NUMBER = _cfg.whatsapp  || "5511999999999";
+const BRAND_NAME      = _cfg.brandName || "Sua Marca";
+
+// Sobrescreve produtos com os salvos no painel admin
+(function () {
+  const saved = localStorage.getItem('pinkAura_products');
+  if (saved) {
+    try {
+      const arr = JSON.parse(saved);
+      if (Array.isArray(arr) && arr.length > 0) {
+        PRODUCTS.splice(0, PRODUCTS.length, ...arr);
+      }
+    } catch {}
+  }
+})();
 
 /* =============================================
    Estado interno
@@ -255,6 +269,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-whatsapp-contato]').forEach(el => {
     el.href = urlContato;
   });
+
+  // Aplicar config do painel admin ao site
+  if (_cfg.heroTag)         { const el = document.getElementById('hero-tag');         if (el) el.textContent = _cfg.heroTag; }
+  if (_cfg.heroTitle)       { const el = document.getElementById('hero-titulo');       if (el) el.textContent = _cfg.heroTitle; }
+  if (_cfg.heroSubtitle)    { const el = document.getElementById('hero-subtitle');     if (el) el.textContent = _cfg.heroSubtitle; }
+  if (_cfg.catalogTitle)    { const el = document.getElementById('catalog-title');     if (el) el.textContent = _cfg.catalogTitle; }
+  if (_cfg.catalogSubtitle) { const el = document.getElementById('catalog-subtitle'); if (el) el.textContent = _cfg.catalogSubtitle; }
+  if (_cfg.footerFrase)     { const el = document.getElementById('footer-frase');     if (el) el.textContent = _cfg.footerFrase; }
 
   configurarFiltros();
   renderProdutos('todas');

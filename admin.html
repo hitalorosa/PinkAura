@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — PinkAura</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- ==================== LOGIN ==================== -->
+  <div id="login-screen">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="brand-icon">✦</div>
+        <span>PinkAura Admin</span>
+      </div>
+      <form id="login-form" novalidate>
+        <div class="field">
+          <label for="login-user">Usuário</label>
+          <input id="login-user" type="text" autocomplete="username" placeholder="Digite o usuário" required>
+        </div>
+        <div class="field">
+          <label for="login-pass">Senha</label>
+          <input id="login-pass" type="password" autocomplete="current-password" placeholder="Digite a senha" required>
+        </div>
+        <p id="login-error" class="login-error" hidden>Usuário ou senha incorretos.</p>
+        <button type="submit" class="btn-primary btn-block">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== ADMIN PANEL ==================== -->
+  <div id="admin-panel" hidden>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="brand-icon">✦</div>
+        <span>PinkAura</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="tab-btn ativo" data-tab="produtos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Produtos
+        </button>
+        <button class="tab-btn" data-tab="site">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          Configurações do Site
+        </button>
+        <button class="tab-btn" data-tab="senha">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Alterar Senha
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="btn-ver-loja" class="btn-outline-sm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Ver loja
+        </button>
+        <button id="btn-logout" class="btn-logout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sair
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="admin-main">
+
+      <!-- ===== TAB: PRODUTOS ===== -->
+      <div id="tab-produtos" class="tab-content">
+        <div class="page-header">
+          <div>
+            <h1>Produtos</h1>
+            <p class="page-subtitle">Gerencie o catálogo da sua loja</p>
+          </div>
+          <button id="btn-novo-produto" class="btn-primary">
+            + Novo Produto
+          </button>
+        </div>
+
+        <div id="lista-produtos" class="product-list"></div>
+
+        <!-- Formulário de produto -->
+        <div id="product-form-section" hidden>
+          <div id="form-produto" class="form-card">
+            <h2 id="form-title">Novo Produto</h2>
+
+            <div class="form-grid">
+              <!-- Nome -->
+              <div class="field span-2">
+                <label for="prod-name">Nome do produto *</label>
+                <input id="prod-name" type="text" placeholder="Ex: Vestido Floral Midi">
+              </div>
+
+              <!-- Categoria -->
+              <div class="field">
+                <label for="prod-category">Categoria *</label>
+                <select id="prod-category">
+                  <option value="">Selecione...</option>
+                  <option value="Vestidos">Vestidos</option>
+                  <option value="Blusas">Blusas</option>
+                  <option value="Calças">Calças</option>
+                  <option value="Saias">Saias</option>
+                  <option value="Conjuntos">Conjuntos</option>
+                  <option value="Acessórios">Acessórios</option>
+                  <option value="Outra">Outra (digitar abaixo)</option>
+                </select>
+              </div>
+              <div class="field" id="cat-custom-field" hidden>
+                <label for="prod-category-custom">Categoria personalizada</label>
+                <input id="prod-category-custom" type="text" placeholder="Nome da categoria">
+              </div>
+
+              <!-- Preço -->
+              <div class="field">
+                <label for="prod-price">Preço</label>
+                <input id="prod-price" type="text" placeholder="Ex: R$ 99,90">
+              </div>
+
+              <!-- Descrição -->
+              <div class="field span-2">
+                <label for="prod-description">Descrição</label>
+                <textarea id="prod-description" rows="3" placeholder="Descreva o produto: tecido, modelagem, detalhes..."></textarea>
+              </div>
+
+              <!-- Cores -->
+              <div class="field span-2">
+                <label>Cores disponíveis *</label>
+                <div id="colors-list" class="dynamic-list"></div>
+                <button type="button" id="btn-add-color" class="btn-add-row">+ Adicionar cor</button>
+              </div>
+
+              <!-- Tamanhos -->
+              <div class="field span-2">
+                <label>Tamanhos disponíveis *</label>
+                <div class="sizes-grid">
+                  <label class="size-option"><input type="checkbox" class="size-checkbox" value="PP"> PP</label>
+                  <label class="size-option"><input type="checkbox" class="size-checkbox" value="P"> P</label>
+                  <label class="size-option"><input type="checkbox" class="size-checkbox" value="M"> M</label>
+                  <label class="size-option"><input type="checkbox" class="size-checkbox" value="G"> G</label>
+                  <label class="size-option"><input type="checkbox" class="size-checkbox" value="GG"> GG</label>
+                  <label class="size-option"><input type="checkbox" class="size-checkbox" value="XG"> XG</label>
+                </div>
+                <input id="custom-sizes" type="text" placeholder="Outros tamanhos separados por vírgula (ex: 36, 38, 40)" style="margin-top:8px">
+              </div>
+
+              <!-- Imagens -->
+              <div class="field span-2">
+                <label>URLs das imagens * <span class="label-hint">(máx. 5)</span></label>
+                <div id="images-list" class="dynamic-list"></div>
+                <button type="button" id="btn-add-image" class="btn-add-row">+ Adicionar imagem</button>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button id="btn-cancelar-produto" class="btn-outline">Cancelar</button>
+              <button id="btn-salvar-produto" class="btn-primary">Salvar produto</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB: SITE ===== -->
+      <div id="tab-site" class="tab-content" hidden>
+        <div class="page-header">
+          <div>
+            <h1>Configurações do Site</h1>
+            <p class="page-subtitle">Textos, nome da marca e WhatsApp</p>
+          </div>
+        </div>
+
+        <form id="form-site" class="form-card">
+
+          <h3 class="section-label">Geral</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label for="cfg-brand">Nome da marca</label>
+              <input id="cfg-brand" type="text" placeholder="Ex: PinkAura">
+            </div>
+            <div class="field">
+              <label for="cfg-whatsapp">WhatsApp (somente números)</label>
+              <input id="cfg-whatsapp" type="text" placeholder="Ex: 5511999999999">
+            </div>
+          </div>
+
+          <h3 class="section-label">Seção Hero (banner principal)</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label for="cfg-hero-tag">Tag de destaque</label>
+              <input id="cfg-hero-tag" type="text" placeholder="Ex: Nova Coleção">
+            </div>
+            <div class="field">
+              <label for="cfg-hero-title">Título principal</label>
+              <input id="cfg-hero-title" type="text" placeholder="Ex: Moda feminina com muito estilo">
+            </div>
+            <div class="field span-2">
+              <label for="cfg-hero-subtitle">Subtítulo</label>
+              <textarea id="cfg-hero-subtitle" rows="2" placeholder="Texto abaixo do título principal..."></textarea>
+            </div>
+          </div>
+
+          <h3 class="section-label">Catálogo</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label for="cfg-catalog-title">Título do catálogo</label>
+              <input id="cfg-catalog-title" type="text" placeholder="Ex: Nossa Vitrine">
+            </div>
+            <div class="field">
+              <label for="cfg-catalog-subtitle">Subtítulo do catálogo</label>
+              <input id="cfg-catalog-subtitle" type="text" placeholder="Ex: Clique em uma peça para ver detalhes">
+            </div>
+          </div>
+
+          <h3 class="section-label">Rodapé</h3>
+          <div class="form-grid">
+            <div class="field span-2">
+              <label for="cfg-footer-frase">Frase do rodapé</label>
+              <textarea id="cfg-footer-frase" rows="2" placeholder="Texto no rodapé da página..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">Salvar configurações</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== TAB: SENHA ===== -->
+      <div id="tab-senha" class="tab-content" hidden>
+        <div class="page-header">
+          <div>
+            <h1>Alterar Senha</h1>
+            <p class="page-subtitle">Troque sua senha de acesso ao painel</p>
+          </div>
+        </div>
+
+        <form id="form-senha" class="form-card" style="max-width:480px">
+          <div class="field">
+            <label for="senha-atual">Senha atual</label>
+            <input id="senha-atual" type="password" autocomplete="current-password" placeholder="Digite a senha atual">
+          </div>
+          <div class="field">
+            <label for="senha-nova">Nova senha</label>
+            <input id="senha-nova" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
+          </div>
+          <div class="field">
+            <label for="senha-confirmar">Confirmar nova senha</label>
+            <input id="senha-confirmar" type="password" autocomplete="new-password" placeholder="Repita a nova senha">
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">Alterar senha</button>
+          </div>
+        </form>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <script src="js/products.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
