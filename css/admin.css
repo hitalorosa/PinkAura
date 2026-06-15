@@ -397,6 +397,8 @@ select {
 }
 
 .color-row input[type="text"] { flex: 1; }
+.color-img-index { width: 58px; text-align: center; flex-shrink: 0; }
+.color-img-index::before { content: 'Foto #'; }
 
 input[type="color"] {
   width: 44px;

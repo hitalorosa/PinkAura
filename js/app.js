@@ -189,6 +189,7 @@ function abrirModal(id) {
              style="background:${c.hex}"
              data-cor="${c.label}"
              data-index="${i}"
+             data-img-index="${c.imageIndex ?? 0}"
              aria-label="Cor ${c.label}"
              title="${c.label}"
              onclick="selecionarCor(this, '${c.label}')"></button>`
@@ -238,6 +239,8 @@ function selecionarCor(el, cor) {
   corSelecionada = cor;
   document.querySelectorAll('.swatch-modal').forEach(s => s.classList.remove('selecionado'));
   el.classList.add('selecionado');
+  const imgIndex = parseInt(el.dataset.imgIndex ?? '0', 10);
+  if (produtoAtualModal.images[imgIndex] !== undefined) trocarFoto(imgIndex);
   atualizarBotaoWhatsApp();
 }
 

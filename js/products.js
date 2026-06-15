@@ -8,9 +8,9 @@ const PRODUCTS = [
     price: "R$ 189,90",
     description: "Vestido midi com estampa floral delicada. Tecido leve e fluido, ideal para dias quentes. Fechamento por zíper invisível na lateral. Caimento solto e elegante.",
     colors: [
-      { label: "Rosa",       hex: "#f48fb1" },
-      { label: "Branco",     hex: "#f0ede8" },
-      { label: "Verde Sage", hex: "#a5c8a0" }
+      { label: "Rosa",       hex: "#f48fb1", imageIndex: 0 },
+      { label: "Branco",     hex: "#f0ede8", imageIndex: 1 },
+      { label: "Verde Sage", hex: "#a5c8a0", imageIndex: 2 }
     ],
     sizes: ["PP", "P", "M", "G", "GG"],
     images: [

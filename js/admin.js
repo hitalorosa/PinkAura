@@ -162,11 +162,13 @@ function cancelForm() {
 }
 
 /* ---- Helpers de linha ---- */
-function colorRow(label, hex) {
+function colorRow(label, hex, imgIndex) {
+  const idx = (imgIndex !== undefined && imgIndex !== null) ? imgIndex + 1 : 1;
   return `
     <div class="color-row">
-      <input type="text"  class="color-label" placeholder="Nome da cor (ex: Rosa)" value="${escHtml(label)}">
-      <input type="color" class="color-hex"   value="${escHtml(hex)}">
+      <input type="text"   class="color-label"     placeholder="Nome da cor (ex: Rosa)" value="${escHtml(label)}">
+      <input type="color"  class="color-hex"        value="${escHtml(hex)}">
+      <input type="number" class="color-img-index"  min="1" max="10" value="${idx}" title="Número da foto que representa esta cor">
       <button type="button" class="btn-remove-row" onclick="removeRow(this,'color-row')" aria-label="Remover cor">×</button>
     </div>`;
 }
@@ -221,7 +223,7 @@ function fillForm(p) {
   }
 
   document.getElementById('colors-list').innerHTML =
-    (p.colors || []).map(c => colorRow(c.label, c.hex)).join('');
+    (p.colors || []).map(c => colorRow(c.label, c.hex, c.imageIndex)).join('');
   colorCount = (p.colors || []).length;
 
   document.querySelectorAll('.size-checkbox').forEach(cb => {
@@ -241,7 +243,7 @@ function addColor() {
 }
 
 function addImage() {
-  if (imageCount >= 5) { showToast('Máximo de 5 imagens por produto.', 'warn'); return; }
+  if (imageCount >= 10) { showToast('Máximo de 10 imagens por produto.', 'warn'); return; }
   imageCount++;
   document.getElementById('images-list').insertAdjacentHTML('beforeend', imageRow(''));
 }
@@ -260,8 +262,9 @@ function getFormData() {
     : catSel;
 
   const colors = Array.from(document.querySelectorAll('.color-row')).map(row => ({
-    label: row.querySelector('.color-label').value.trim(),
-    hex:   row.querySelector('.color-hex').value
+    label:      row.querySelector('.color-label').value.trim(),
+    hex:        row.querySelector('.color-hex').value,
+    imageIndex: Math.max(0, parseInt(row.querySelector('.color-img-index').value || '1', 10) - 1)
   })).filter(c => c.label);
 
   const checked = Array.from(document.querySelectorAll('.size-checkbox:checked')).map(cb => cb.value);
