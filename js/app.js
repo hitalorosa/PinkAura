@@ -51,6 +51,56 @@ function whatsappLinkSimples(nomeProduto) {
 }
 
 /* =============================================
+   Preços com comparação
+   ============================================= */
+function parsePreco(str) {
+  if (!str) return 0;
+  return parseFloat(str.replace(/[R$\s.]/g, '').replace(',', '.')) || 0;
+}
+
+function calcDesconto(preco, precoOriginal) {
+  const atual = parsePreco(preco);
+  const orig  = parsePreco(precoOriginal);
+  if (!orig || orig <= atual) return 0;
+  return Math.round((1 - atual / orig) * 100);
+}
+
+function buildPrecoCardHtml(produto) {
+  if (!produto.price) return '';
+  if (!produto.priceOriginal) {
+    return `<p class="card-preco">${produto.price}</p>`;
+  }
+  const pct = calcDesconto(produto.price, produto.priceOriginal);
+  const badge = pct > 0
+    ? `<span class="price-badge">−${pct}%</span>` : '';
+  return `
+    <div class="card-preco-grupo">
+      <div class="card-preco-linha">
+        <span class="card-preco-atual">${produto.price}</span>
+        ${badge}
+      </div>
+      <span class="card-preco-original">de ${produto.priceOriginal}</span>
+    </div>`;
+}
+
+function renderModalPreco(produto) {
+  const el = document.getElementById('modal-preco');
+  if (!produto.price) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  if (!produto.priceOriginal) {
+    el.innerHTML = `<span class="modal-preco-atual">${produto.price}</span>`;
+    return;
+  }
+  const pct = calcDesconto(produto.price, produto.priceOriginal);
+  const badge = pct > 0
+    ? `<span class="modal-badge-desconto">−${pct}%</span>` : '';
+  el.innerHTML = `
+    <span class="modal-preco-atual">${produto.price}</span>
+    ${badge}
+    <span class="modal-preco-original">de ${produto.priceOriginal}</span>`;
+}
+
+/* =============================================
    Renderizar produtos
    ============================================= */
 function renderProdutos(filtro = 'todas') {
@@ -78,8 +128,7 @@ function renderProdutos(filtro = 'todas') {
       `<span class="pill-tamanho-mini">${s}</span>`
     ).join('');
 
-    const precoHtml = produto.price
-      ? `<p class="card-preco">${produto.price}</p>` : '';
+    const precoHtml = buildPrecoCardHtml(produto);
 
     return `
       <article class="card-produto" data-id="${produto.id}"
@@ -164,9 +213,8 @@ function abrirModal(id) {
   // Preencher info
   document.getElementById('modal-categoria').textContent = produto.category;
   document.getElementById('modal-nome').textContent      = produto.name;
-  document.getElementById('modal-preco').textContent     = produto.price || '';
   document.getElementById('modal-descricao').textContent = produto.description;
-  document.getElementById('modal-preco').style.display   = produto.price ? '' : 'none';
+  renderModalPreco(produto);
 
   // Galeria
   const fotoPrincipal = document.getElementById('modal-foto-principal');

@@ -133,6 +133,14 @@ a { text-decoration: none; color: inherit; }
   color: var(--vinho);
   margin-bottom: 7px;
 }
+.field-hint {
+  display: block;
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--taupe);
+  letter-spacing: 0;
+  margin-top: 2px;
+}
 .input-wrap { position: relative; display: flex; align-items: center; }
 .input-wrap .i-icon {
   position: absolute; left: 15px;
