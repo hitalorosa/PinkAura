@@ -309,6 +309,20 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
    ========================================= */
 .catalogo { position: relative; background: #fff; padding: 72px 0 90px; }
 
+/* Onda branca que suaviza a transição hero → vitrine */
+.catalogo::before {
+  content: '';
+  position: absolute;
+  top: -58px;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 60' preserveAspectRatio='none'%3E%3Cpath fill='%23ffffff' d='M0,60 C480,12 960,12 1440,60 L1440,60 L0,60 Z'/%3E%3C/svg%3E") no-repeat;
+  background-size: 100% 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
 .catalogo-header { position: relative; text-align: center; margin-bottom: 40px; }
 .catalogo-aura {
   position: absolute;
@@ -805,17 +819,28 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   .nav-links { display: none; }
   .header-whatsapp span { display: none; }
 
-  .hero-inner { min-height: auto; padding: 48px 0; grid-template-columns: 1fr; }
+  .hero-inner { min-height: auto; padding: 44px 0 30px; grid-template-columns: 1fr; }
   .hero-copy { padding: 0; text-align: center; max-width: 100%; }
   .hero-ctas { justify-content: center; }
   .hero-subtitle { margin-left: auto; margin-right: auto; }
   .hero-visual { display: none; }
   .hero-aura { display: none; }
 
+  /* Catalog — menos respiro no topo no mobile */
+  .catalogo { padding-top: 50px; }
+
   .grade-produtos {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 16px;
   }
+
+  /* Footer — layout 2 colunas no mobile, menos padding */
+  .site-footer { padding: 38px 20px 22px; }
+  .footer-inner { grid-template-columns: 1fr 1fr; gap: 24px 16px; }
+  .footer-brand-col { grid-column: 1 / -1; max-width: 100%; }
+  .footer-slogan { font-size: 20px; margin-top: 10px; }
+  .footer-logo img { height: 40px; }
+  .footer-bottom { margin-top: 20px; flex-direction: column; gap: 4px; text-align: center; justify-content: center; }
 
   .modal-caixa {
     grid-template-columns: 1fr;
