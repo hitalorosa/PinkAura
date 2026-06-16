@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,600&family=Dancing+Script:wght@600;700&family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#fff}
+  ::selection{background:#F5C6DD;color:#6B0A3C}
+  @keyframes auraPulse{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.06);opacity:1}}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  @keyframes twinkle{0%,100%{opacity:.25;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
+  @keyframes sheetUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+
+<div data-screen-label="Pink Aura — Vitrine" style="font-family:'Nunito',system-ui,sans-serif;color:#6B0A3C;background:#fff;min-height:100vh;overflow-x:hidden">
+
+  <!-- ============ HEADER ============ -->
+  <header data-screen-label="Header" style="position:sticky;top:0;z-index:60;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid #F5DCE8;box-shadow:{{ headerShadow }};transition:box-shadow .3s">
+    <div style="max-width:1240px;margin:0 auto;height:68px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;gap:18px">
+      <a href="#topo" style="display:flex;align-items:center;gap:11px;text-decoration:none">
+        <img src="assets/lily.png" alt="Lírio Pink Aura" style="height:46px;width:auto;display:block">
+        <span style="display:flex;align-items:baseline;gap:5px;line-height:1">
+          <span style="font-family:'Cormorant Garamond',serif;font-weight:700;font-size:31px;color:#6B0A3C;letter-spacing:1.5px">PINK</span>
+          <span style="font-family:'Dancing Script',cursive;font-weight:700;font-size:32px;color:#C9177C;margin-left:-2px">aura</span>
+        </span>
+      </a>
+      <nav style="display:flex;align-items:center;gap:30px">
+        <span style="display:flex;gap:28px;font-weight:600;font-size:14px;letter-spacing:.3px">
+          <a href="#colecao" style="color:#6B0A3C;text-decoration:none;transition:.2s" style-hover="color:#C9177C">Coleção</a>
+          <a href="#colecao" style="color:#6B0A3C;text-decoration:none;transition:.2s" style-hover="color:#C9177C">Editorias</a>
+          <a href="#sobre" style="color:#6B0A3C;text-decoration:none;transition:.2s" style-hover="color:#C9177C">Sobre</a>
+        </span>
+        <a href="{{ waMain }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;font-weight:700;font-size:13.5px;padding:10px 18px;border-radius:999px;text-decoration:none;box-shadow:0 6px 16px rgba(37,211,102,.32);transition:.2s" style-hover="transform:translateY(-2px);box-shadow:0 10px 22px rgba(37,211,102,.42)">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zM6.597 20.13c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.82 9.82 0 001.515 5.26l-.999 3.648 3.973-.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.247-.694.247-1.289.173-1.413z"/></svg>
+          Fale conosco
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section id="topo" data-screen-label="Hero" style="position:relative;overflow:hidden;background:linear-gradient(160deg,#FDF0F5 0%,#FFF6FA 42%,#FBE0EC 82%,#F7D2E4 100%)">
+    <sc-if value="{{ showWm }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;inset:0;opacity:.9;pointer-events:none;background-image:url(data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%27380%27%20height=%27175%27%3E%3Ctext%20x=%276%27%20y=%2776%27%20font-family=%27Georgia,serif%27%20font-size=%2758%27%20font-weight=%27700%27%20fill=%27%23C9177C%27%20fill-opacity=%270.05%27%3EPINK%3C/text%3E%3Ctext%20x=%2740%27%20y=%27140%27%20font-family=%27Brush%20Script%20MT,cursive%27%20font-size=%2766%27%20font-style=%27italic%27%20fill=%27%23C9177C%27%20fill-opacity=%270.05%27%3Eaura%3C/text%3E%3C/svg%3E)"></div>
+    </sc-if>
+    <!-- aura radial -->
+    <div style="position:absolute;right:-120px;top:50%;transform:translateY(-50%);width:620px;height:620px;border-radius:50%;background:radial-gradient(circle, rgba(245,198,221,.85) 0%, rgba(239,139,191,.35) 38%, rgba(253,240,245,0) 70%);animation:auraPulse 9s ease-in-out infinite;pointer-events:none"></div>
+
+    <div style="position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:0 26px 96px;min-height:600px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));align-items:center;gap:40px">
+      <!-- copy -->
+      <div style="padding:54px 0;max-width:560px">
+        <span style="display:inline-flex;align-items:center;gap:7px;background:#C9177C;color:#fff;font-weight:700;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;padding:8px 16px;border-radius:999px;box-shadow:0 8px 20px rgba(201,23,124,.28)">
+          <span style="font-size:13px">✦</span>{{ tagText }}
+        </span>
+        <h1 style="font-family:'Cormorant Garamond',serif;font-weight:700;color:#6B0A3C;font-size:clamp(46px,6vw,76px);line-height:1.02;margin:22px 0 0;letter-spacing:-.5px">
+          Moda feminina<br>com muito
+          <span style="font-family:'Dancing Script',cursive;font-weight:700;color:#C9177C;font-size:clamp(58px,7.4vw,96px);display:inline-block;line-height:.9">estilo</span>
+        </h1>
+        <p style="font-family:'Dancing Script',cursive;font-weight:600;color:#C9177C;font-size:26px;margin:20px 0 0">Cultive sua energia ✧</p>
+        <p style="font-size:17px;line-height:1.7;color:#9C6B82;max-width:440px;margin:12px 0 0">Peças versáteis para mulheres que valorizam liberdade, confiança e individualidade — do dia a dia aos momentos mais marcantes.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:32px">
+          <a href="#colecao" style="display:inline-flex;align-items:center;gap:9px;background:#C9177C;color:#fff;font-weight:700;font-size:15px;padding:15px 30px;border-radius:999px;text-decoration:none;box-shadow:0 12px 28px rgba(201,23,124,.32);transition:.25s" style-hover="background:#6B0A3C;transform:translateY(-2px);box-shadow:0 16px 34px rgba(107,10,60,.34)">
+            Ver a coleção
+            <span style="font-size:16px">→</span>
+          </a>
+          <a href="{{ waMain }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:9px;background:#fff;color:#6B0A3C;font-weight:700;font-size:15px;padding:15px 28px;border-radius:999px;text-decoration:none;border:1.5px solid #F0C8DC;transition:.25s" style-hover="border-color:#C9177C;color:#C9177C">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#25D366"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.54-3.87c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.82 9.82 0 001.515 5.26l-.999 3.648 3.973-.607z"/></svg>
+            Atendimento
+          </a>
+        </div>
+      </div>
+      <!-- hero visual -->
+      <div style="position:relative;display:flex;justify-content:center;align-items:center;padding:30px 0">
+        <div style="position:relative;width:min(420px,86vw);aspect-ratio:4/5;border-radius:46% 54% 56% 44% / 52% 44% 56% 48%;background:radial-gradient(120% 100% at 30% 12%, rgba(255,255,255,.55), transparent 50%), linear-gradient(150deg,#F5C6DD 0%,#EF8BBF 58%,#C9177C 116%);box-shadow:0 30px 70px rgba(201,23,124,.28);animation:floaty 7s ease-in-out infinite;overflow:hidden;display:flex;align-items:center;justify-content:center">
+          <img src="assets/lily.png" alt="" style="width:62%;opacity:.9;filter:brightness(1.4) drop-shadow(0 8px 20px rgba(107,10,60,.18))">
+        </div>
+        <span style="position:absolute;top:6%;right:8%;color:#C9177C;font-size:30px;animation:twinkle 3.2s ease-in-out infinite">✦</span>
+        <span style="position:absolute;bottom:14%;right:2%;color:#EF8BBF;font-size:20px;animation:twinkle 2.6s ease-in-out .6s infinite">✧</span>
+        <span style="position:absolute;top:24%;left:2%;color:#F5C6DD;font-size:24px;animation:twinkle 3.6s ease-in-out 1s infinite">✦</span>
+      </div>
+    </div>
+
+    <!-- transição orgânica hero → vitrine -->
+    <div aria-hidden="true" style="position:absolute;left:0;right:0;bottom:-1px;z-index:1;line-height:0;pointer-events:none">
+      <svg viewBox="0 0 1440 150" preserveAspectRatio="none" style="display:block;width:100%;height:clamp(70px,11vw,140px)">
+        <path d="M0,60 C240,140 520,140 760,92 C1000,46 1230,30 1440,96 L1440,150 L0,150 Z" fill="#FBE3EF"></path>
+        <path d="M0,96 C260,150 560,150 800,108 C1040,68 1240,66 1440,118 L1440,150 L0,150 Z" fill="#F7D2E4"></path>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ============ CATALOG ============ -->
+  <section id="colecao" data-screen-label="Catálogo" style="position:relative;background:linear-gradient(180deg,#F7D2E4 0px,#FBE3EF 46px,#FDF0F5 130px,#FFFFFF 300px);padding:84px 0 90px">
+    <div style="max-width:1240px;margin:0 auto;padding:0 26px">
+      <!-- section header -->
+      <div style="position:relative;text-align:center;margin-bottom:40px">
+        <div style="position:absolute;left:50%;top:-44px;transform:translateX(-50%);width:300px;height:180px;background:radial-gradient(circle, rgba(239,139,191,.45) 0%, rgba(253,240,245,0) 70%);pointer-events:none"></div>
+        <span style="position:relative;display:inline-block;font-size:22px;letter-spacing:9px;color:#EF8BBF">✦ ✧ ✦</span>
+        <p style="position:relative;font-family:'Dancing Script',cursive;font-weight:700;color:#C9177C;font-size:24px;margin:0">explore nossas peças</p>
+        <h2 style="position:relative;font-family:'Cormorant Garamond',serif;font-weight:700;color:#6B0A3C;font-size:clamp(34px,4.4vw,52px);margin:2px 0 0;letter-spacing:-.5px">Nossa Coleção</h2>
+        <p style="position:relative;color:#B08AA0;font-size:15px;max-width:440px;margin:12px auto 0">Quatro editorias, infinitas possibilidades de expressar a sua essência.</p>
+      </div>
+
+      <!-- filters -->
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-bottom:44px">
+        <sc-for list="{{ categories }}" as="c" hint-placeholder-count="6">
+          <button type="button" onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.name }}</button>
+        </sc-for>
+      </div>
+
+      <!-- grid -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(45%,250px),1fr));gap:26px">
+        <sc-for list="{{ products }}" as="p" hint-placeholder-count="8">
+          <div onClick="{{ p.onOpen }}" style="position:relative;background:#fff;border-radius:18px;border:1.5px solid #F5E6EE;overflow:hidden;cursor:pointer;transition:.28s;box-shadow:0 4px 18px rgba(201,23,124,.05)" style-hover="box-shadow:0 18px 40px rgba(201,23,124,.16);border-color:#EF8BBF;transform:translateY(-5px)">
+            <div style="position:relative;aspect-ratio:3/4;background-image:{{ p.bg }};background-size:cover;display:flex;align-items:center;justify-content:center;overflow:hidden">
+              <img src="assets/lily.png" alt="" style="width:58%;opacity:.42;mix-blend-mode:soft-light"/>
+              <span style="position:absolute;top:12px;left:12px;background:rgba(255,255,255,.82);backdrop-filter:blur(4px);color:#C9177C;font-weight:700;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;padding:5px 11px;border-radius:999px">{{ p.cat }}</span>
+              <span style="position:absolute;bottom:12px;left:14px;font-family:'Dancing Script',cursive;color:#fff;font-size:21px;font-weight:700;text-shadow:0 2px 8px rgba(107,10,60,.35)">look {{ p.look }}</span>
+              <a href="{{ p.waHref }}" target="_blank" rel="noopener" onClick="{{ p.stopProp }}" aria-label="Falar no WhatsApp" style="position:absolute;bottom:12px;right:12px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:#25D366;border-radius:50%;box-shadow:0 6px 16px rgba(37,211,102,.4);transition:.2s" style-hover="transform:scale(1.1)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.54-3.87c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.82 9.82 0 001.515 5.26l-.999 3.648 3.973-.607z"/></svg>
+              </a>
+            </div>
+            <div style="padding:16px 18px 18px">
+              <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;color:#6B0A3C;font-size:21px;margin:0;line-height:1.15">{{ p.name }}</h3>
+              <p style="font-family:'Nunito',sans-serif;font-weight:800;color:#C9177C;font-size:18px;margin:6px 0 0">{{ p.priceFmt }}</p>
+              <div style="display:flex;align-items:center;gap:7px;margin-top:13px">
+                <sc-for list="{{ p.colors }}" as="cl" hint-placeholder-count="3">
+                  <span style="width:16px;height:16px;border-radius:50%;background:{{ cl }};box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)"></span>
+                </sc-for>
+                <span style="flex:1"></span>
+                <div style="display:flex;gap:5px">
+                  <sc-for list="{{ p.sizes }}" as="s" hint-placeholder-count="3">
+                    <span style="font-size:10.5px;font-weight:600;color:#8A4D69;background:#F7EEF3;padding:3px 7px;border-radius:6px">{{ s }}</span>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SOBRE / STRIP ============ -->
+  <section id="sobre" style="position:relative;overflow:hidden;background:linear-gradient(120deg,#6B0A3C 0%,#9C1259 60%,#C9177C 130%);padding:64px 26px">
+    <div style="position:relative;max-width:900px;margin:0 auto;text-align:center">
+      <span style="color:#F5C6DD;font-size:26px;letter-spacing:8px">✦ ✧ ✦</span>
+      <p style="font-family:'Cormorant Garamond',serif;color:#fff;font-weight:600;font-size:clamp(26px,3.4vw,40px);line-height:1.3;margin:16px 0 0">Roupas que realçam a confiança e a individualidade — para que cada mulher se sinta bem <span style="font-family:'Dancing Script',cursive;color:#F5C6DD;font-size:1.15em">sem abrir mão da sua essência.</span></p>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer data-screen-label="Footer" style="position:relative;overflow:hidden;background:#6B0A3C;color:#E8D2DD;padding:58px 26px 30px">
+    <div style="position:relative;max-width:1240px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:38px">
+      <div style="max-width:340px">
+        <div style="display:flex;align-items:center;gap:11px">
+          <img src="assets/lily.png" alt="" style="height:48px;width:auto;filter:brightness(1.5)">
+          <span style="display:flex;align-items:baseline;gap:5px;line-height:1">
+            <span style="font-family:'Cormorant Garamond',serif;font-weight:700;font-size:30px;color:#fff;letter-spacing:1.5px">PINK</span>
+            <span style="font-family:'Dancing Script',cursive;font-weight:700;font-size:31px;color:#F5C6DD">aura</span>
+          </span>
+        </div>
+        <p style="font-family:'Dancing Script',cursive;color:#F5C6DD;font-size:24px;font-weight:600;margin:16px 0 0">Cultive sua energia</p>
+        <p style="color:#C4B5A8;font-size:14px;line-height:1.7;margin:10px 0 0">Moda feminina para mulheres jovens que buscam versatilidade, estilo e conforto em um só lugar.</p>
+      </div>
+      <div>
+        <h4 style="font-family:'Nunito',sans-serif;color:#fff;font-weight:700;font-size:13px;letter-spacing:1.4px;text-transform:uppercase;margin:0 0 16px">Editorias</h4>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <a href="#colecao" style="color:#C4B5A8;text-decoration:none;font-size:14px;transition:.2s" style-hover="color:#fff">Intensa · Magenta</a>
+          <a href="#colecao" style="color:#C4B5A8;text-decoration:none;font-size:14px;transition:.2s" style-hover="color:#fff">Fresh · Periwinkle</a>
+          <a href="#colecao" style="color:#C4B5A8;text-decoration:none;font-size:14px;transition:.2s" style-hover="color:#fff">Romântica · Lavanda</a>
+          <a href="#colecao" style="color:#C4B5A8;text-decoration:none;font-size:14px;transition:.2s" style-hover="color:#fff">Ensolarada · Creme</a>
+        </div>
+      </div>
+      <div>
+        <h4 style="font-family:'Nunito',sans-serif;color:#fff;font-weight:700;font-size:13px;letter-spacing:1.4px;text-transform:uppercase;margin:0 0 16px">Fale com a gente</h4>
+        <div style="display:flex;flex-direction:column;gap:13px">
+          <a href="{{ waMain }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:9px;color:#C4B5A8;text-decoration:none;font-size:14px;font-weight:600;transition:.2s" style-hover="color:#25D366">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="#25D366"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.54-3.87c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.82 9.82 0 001.515 5.26l-.999 3.648 3.973-.607z"/></svg>
+            WhatsApp
+          </a>
+          <a href="https://instagram.com/ninebydebora" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:9px;color:#C4B5A8;text-decoration:none;font-size:14px;font-weight:600;transition:.2s" style-hover="color:#EF8BBF">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#EF8BBF" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="1.2" fill="#EF8BBF" stroke="none"/></svg>
+            @ninebydebora
+          </a>
+        </div>
+      </div>
+    </div>
+    <div style="position:relative;max-width:1240px;margin:36px auto 0;padding-top:22px;border-top:1px solid rgba(245,198,221,.18);display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;color:#9C7E8C;font-size:12.5px">
+      <span>© 2026 Pink Aura. Todos os direitos reservados.</span>
+      <span style="display:inline-flex;gap:6px;align-items:center">feito com <span style="color:#EF8BBF">♡</span> para mulheres autênticas</span>
+    </div>
+  </footer>
+
+  <!-- ============ MODAL ============ -->
+  <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ m.onClose }}" style="position:fixed;inset:0;z-index:100;background:rgba(107,10,60,.45);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:fadeIn .2s ease">
+      <div onClick="{{ m.stop }}" style="position:relative;width:min(940px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:22px;box-shadow:0 40px 90px rgba(107,10,60,.4);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));animation:sheetUp .32s cubic-bezier(.22,1,.36,1)">
+        <button type="button" onClick="{{ m.onClose }}" aria-label="Fechar" style="position:absolute;top:14px;right:14px;z-index:5;width:38px;height:38px;border:none;border-radius:50%;background:rgba(255,255,255,.9);color:#6B0A3C;font-size:20px;cursor:pointer;box-shadow:0 4px 12px rgba(107,10,60,.18);transition:.2s" style-hover="background:#C9177C;color:#fff;transform:rotate(90deg)">×</button>
+        <!-- gallery -->
+        <div style="background:#FDF8FA;padding:24px;display:flex;flex-direction:column;gap:14px">
+          <div style="position:relative;width:100%;aspect-ratio:3/4;border-radius:14px;background-image:{{ m.mainBg }};background-size:cover;display:flex;align-items:center;justify-content:center;overflow:hidden">
+            <img src="assets/lily.png" alt="" style="width:54%;opacity:.4;mix-blend-mode:soft-light">
+            <span style="position:absolute;bottom:14px;left:16px;font-family:'Dancing Script',cursive;color:#fff;font-size:22px;font-weight:700;text-shadow:0 2px 8px rgba(107,10,60,.35)">Pink aura</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+            <sc-for list="{{ m.gallery }}" as="g" hint-placeholder-count="3">
+              <div onClick="{{ g.onClick }}" style="{{ g.style }}" style-hover="border-color:#EF8BBF"></div>
+            </sc-for>
+          </div>
+        </div>
+        <!-- info -->
+        <div style="padding:30px 30px 30px;display:flex;flex-direction:column">
+          <span style="align-self:flex-start;background:#C9177C;color:#fff;font-weight:700;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;padding:5px 13px;border-radius:999px">{{ m.cat }}</span>
+          <h2 style="font-family:'Cormorant Garamond',serif;font-weight:700;color:#6B0A3C;font-size:30px;margin:14px 0 0;line-height:1.1">{{ m.name }}</h2>
+          <p style="font-family:'Nunito',sans-serif;font-weight:800;color:#C9177C;font-size:24px;margin:8px 0 0">{{ m.priceFmt }}</p>
+          <p style="color:#8A6577;font-size:15px;line-height:1.65;margin:16px 0 0">{{ m.desc }}</p>
+
+          <p style="font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#6B0A3C;margin:24px 0 11px">Cor</p>
+          <div style="display:flex;gap:12px">
+            <sc-for list="{{ m.colors }}" as="cl" hint-placeholder-count="3">
+              <button type="button" onClick="{{ cl.onClick }}" aria-label="Selecionar cor" style="{{ cl.style }}"></button>
+            </sc-for>
+          </div>
+
+          <p style="font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#6B0A3C;margin:24px 0 11px">Tamanho</p>
+          <div style="display:flex;flex-wrap:wrap;gap:9px">
+            <sc-for list="{{ m.sizes }}" as="sz" hint-placeholder-count="5">
+              <button type="button" onClick="{{ sz.onClick }}" style="{{ sz.style }}">{{ sz.label }}</button>
+            </sc-for>
+          </div>
+
+          <span style="flex:1;min-height:24px"></span>
+          <a href="{{ m.waHref }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;gap:11px;background:#25D366;color:#fff;font-weight:700;font-size:16px;padding:16px 24px;border-radius:14px;text-decoration:none;box-shadow:0 12px 28px rgba(37,211,102,.34);transition:.22s" style-hover="background:#1faf53;transform:translateY(-2px);box-shadow:0 16px 34px rgba(37,211,102,.42)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.54-3.87c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.82 9.82 0 001.515 5.26l-.999 3.648 3.973-.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.247-.694.247-1.289.173-1.413z"/></svg>
+            Quero esse! Falar no WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;whatsappNumber&quot;: { &quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;5511999999999&quot;, &quot;tsType&quot;: &quot;string&quot; },
+  &quot;collectionTag&quot;: { &quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;Nova Coleção&quot;, &quot;tsType&quot;: &quot;string&quot; },
+  &quot;showWatermark&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot; }
+}">
+class Component extends DCLogic {
+  state = { cat: 'Todos', scrolled: false, modalId: null, gi: 0, selColor: 0, selSize: 1 };
+
+  componentDidMount() {
+    this._onScroll = () => {
+      const v = window.scrollY > 12;
+      if (v !== this.state.scrolled) this.setState({ scrolled: v });
+    };
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+  }
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this._onScroll);
+  }
+
+  ED = {
+    magenta:    { g: 'linear-gradient(150deg,#FDEFF5 0%,#F5C6DD 52%,#EF8BBF 100%)', t: '#C9177C' },
+    periwinkle: { g: 'linear-gradient(150deg,#EEF4FC 0%,#CCDBEF 55%,#B8CDE8 100%)', t: '#5C79A6' },
+    lavanda:    { g: 'linear-gradient(150deg,#F5EEF9 0%,#E0CBEA 55%,#D4B8E0 100%)', t: '#8A5BA8' },
+    creme:      { g: 'linear-gradient(150deg,#FCFAE4 0%,#F6F0A6 60%,#ECE38A 100%)', t: '#988A2C' },
+  };
+
+  PRODUCTS = [
+    { id:'p1',  name:'Vestido Midi Aurora',   cat:'Vestidos',   price:18990, ed:'magenta',    look:'01', desc:'Malha canelada de caimento fluido, decote suave e comprimento midi. Do escritório ao happy hour sem esforço.', colors:['#C9177C','#6B0A3C','#F5C6DD'], sizes:['PP','P','M','G','GG'] },
+    { id:'p2',  name:'Blusa Cropped Energia', cat:'Blusas',     price:8990,  ed:'periwinkle', look:'02', desc:'Cropped de alça larga em tecido fresco. Leve, moderno e perfeito para sobreposições.', colors:['#B8CDE8','#FFFFFF','#6B0A3C'], sizes:['P','M','G'] },
+    { id:'p3',  name:'Saia Plissada Lírio',   cat:'Saias',      price:12990, ed:'lavanda',    look:'03', desc:'Saia midi plissada com movimento delicado e cós alto que valoriza a silhueta.', colors:['#D4B8E0','#6B0A3C','#F5C6DD'], sizes:['P','M','G','GG'] },
+    { id:'p4',  name:'Conjunto Brilho',       cat:'Conjuntos',  price:21990, ed:'creme',      look:'04', desc:'Conjunto de tricô leve — top e saia — em tom ensolarado. Coordenado cheio de energia suave.', colors:['#F5EFA0','#EF8BBF','#FFFFFF'], sizes:['P','M','G'] },
+    { id:'p5',  name:'Vestido Longo Intensa', cat:'Vestidos',   price:24990, ed:'magenta',    look:'05', desc:'Vestido longo com fenda e amarração nas costas. Presença e autenticidade para a noite.', colors:['#C9177C','#6B0A3C'], sizes:['P','M','G','GG'] },
+    { id:'p6',  name:'Calça Pantalona Fluida',cat:'Calças',     price:15990, ed:'periwinkle', look:'06', desc:'Pantalona de alfaiataria leve com caimento impecável e cintura marcada.', colors:['#B8CDE8','#C4B5A8','#6B0A3C'], sizes:['36','38','40','42','44'] },
+    { id:'p7',  name:'Blusa Manga Bufante',   cat:'Blusas',     price:9990,  ed:'lavanda',    look:'07', desc:'Blusa romântica de manga bufante e gola delicada. Feminilidade no detalhe.', colors:['#D4B8E0','#FFFFFF','#EF8BBF'], sizes:['P','M','G'] },
+    { id:'p8',  name:'Macacão Autêntica',     cat:'Conjuntos',  price:19990, ed:'magenta',    look:'08', desc:'Macacão pantacourt com decote em V e faixa removível. Versátil e marcante.', colors:['#C9177C','#6B0A3C','#C4B5A8'], sizes:['P','M','G','GG'] },
+    { id:'p9',  name:'Saia Midi Pétala',      cat:'Saias',      price:13990, ed:'creme',      look:'09', desc:'Saia evasê com leve brilho acetinado em tom creme. Movimento de pétala a cada passo.', colors:['#F5EFA0','#F5C6DD','#FFFFFF'], sizes:['P','M','G','GG'] },
+    { id:'p10', name:'Cropped Tricô Aura',    cat:'Blusas',     price:7990,  ed:'lavanda',    look:'10', desc:'Cropped de tricô canelado com toque macio. Conforto que abraça.', colors:['#D4B8E0','#EF8BBF','#C4B5A8'], sizes:['Único'] },
+    { id:'p11', name:'Vestido Curto Solta',   cat:'Vestidos',   price:16990, ed:'periwinkle', look:'11', desc:'Vestido curto soltinho em viscose fresca, ideal para os dias quentes.', colors:['#B8CDE8','#F5C6DD','#FFFFFF'], sizes:['P','M','G'] },
+    { id:'p12', name:'Conjunto Alfaiataria',  cat:'Conjuntos',  price:26990, ed:'magenta',    look:'12', desc:'Blazer e short de alfaiataria em corte moderno. Poder e elegância em um só look.', colors:['#6B0A3C','#C9177C','#C4B5A8'], sizes:['P','M','G','GG'] },
+  ];
+
+  brl(c) { return 'R$ ' + (c / 100).toFixed(2).replace('.', ','); }
+
+  cardBg(ed) {
+    const e = this.ED[ed];
+    return 'radial-gradient(120% 85% at 72% 4%, rgba(255,255,255,.6), rgba(255,255,255,0) 52%), ' + e.g;
+  }
+  galBg(ed, i) {
+    const e = this.ED[ed];
+    const pos = ['72% 4%', '22% 82%', '50% 50%'][i] || '50% 50%';
+    return 'radial-gradient(110% 80% at ' + pos + ', rgba(255,255,255,.66), transparent 55%), ' + e.g;
+  }
+
+  waHref(name, extra) {
+    const num = String(this.props.whatsappNumber || '5511999999999').replace(/\D/g, '');
+    const txt = 'Olá! Vim pelo site da Pink Aura 💗 Tenho interesse na peça: ' + name + (extra || '') + '.';
+    return 'https://wa.me/' + num + '?text=' + encodeURIComponent(txt);
+  }
+
+  wmUrl(fill, op) {
+    return "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='380' height='175'%3E%3Ctext x='6' y='76' font-family='Georgia,serif' font-size='58' font-weight='700' fill='%23" + fill + "' fill-opacity='" + op + "'%3EPINK%3C/text%3E%3Ctext x='48' y='138' font-family='Segoe Script,cursive' font-size='62' font-style='italic' fill='%23" + fill + "' fill-opacity='" + op + "'%3Eaura%3C/text%3E%3C/svg%3E\")";
+  }
+
+  renderVals() {
+    const cat = this.state.cat;
+    const cats = ['Todos', 'Vestidos', 'Blusas', 'Saias', 'Calças', 'Conjuntos'];
+    const base = 'padding:11px 24px;border-radius:999px;font-family:Nunito,sans-serif;font-weight:600;font-size:13px;letter-spacing:.9px;text-transform:uppercase;cursor:pointer;transition:.22s;white-space:nowrap;';
+    const categories = cats.map(name => {
+      const active = name === cat;
+      return {
+        name,
+        style: base + (active
+          ? 'background:#C9177C;color:#fff;border:1.5px solid #C9177C;box-shadow:0 6px 18px rgba(201,23,124,.28);'
+          : 'background:#fff;color:#6B0A3C;border:1.5px solid #F3D3E2;'),
+        onClick: () => this.setState({ cat: name }),
+      };
+    });
+
+    const products = this.PRODUCTS.filter(p => cat === 'Todos' || p.cat === cat).map(p => ({
+      id: p.id, name: p.name, cat: p.cat, look: p.look,
+      priceFmt: this.brl(p.price),
+      bg: this.cardBg(p.ed), tint: this.ED[p.ed].t,
+      colors: p.colors, sizes: p.sizes,
+      waHref: this.waHref(p.name),
+      stopProp: (e) => { e.stopPropagation(); },
+      onOpen: () => this.setState({ modalId: p.id, gi: 0, selColor: 0, selSize: Math.min(1, p.sizes.length - 1) }),
+    }));
+
+    const mp = this.PRODUCTS.find(p => p.id === this.state.modalId);
+    let m = {};
+    if (mp) {
+      const gi = this.state.gi, sc = this.state.selColor, ss = this.state.selSize;
+      m = {
+        name: mp.name, cat: mp.cat, desc: mp.desc,
+        priceFmt: this.brl(mp.price), tint: this.ED[mp.ed].t,
+        mainBg: this.galBg(mp.ed, gi),
+        stop: (e) => { e.stopPropagation(); },
+        onClose: () => this.setState({ modalId: null }),
+        gallery: [0, 1, 2].map(i => ({
+          onClick: () => this.setState({ gi: i }),
+          style: 'width:100%;aspect-ratio:1;border-radius:12px;background-image:' + this.galBg(mp.ed, i) + ';background-size:cover;cursor:pointer;transition:.2s;border:2px solid ' + (i === gi ? '#C9177C' : 'transparent') + ';',
+        })),
+        colors: mp.colors.map((hex, i) => ({
+          onClick: () => this.setState({ selColor: i }),
+          style: 'width:32px;height:32px;border-radius:50%;cursor:pointer;border:none;background:' + hex + ';transition:.2s;box-shadow:' + (i === sc ? '0 0 0 2px #fff,0 0 0 4px #C9177C' : 'inset 0 0 0 1px rgba(0,0,0,.1)') + ';',
+        })),
+        sizes: mp.sizes.map((label, i) => ({
+          label,
+          onClick: () => this.setState({ selSize: i }),
+          style: 'min-width:48px;padding:11px 6px;text-align:center;border-radius:11px;font-family:Nunito,sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:.2s;' + (i === ss
+            ? 'background:#C9177C;color:#fff;border:1.5px solid #C9177C;'
+            : 'background:#fff;color:#6B0A3C;border:1.5px solid #E7C6D6;'),
+        })),
+        waHref: this.waHref(mp.name, ' (cor ' + (mp.colors[sc] || '') + ', tam. ' + (mp.sizes[ss] || '') + ')'),
+      };
+    }
+
+    return {
+      showWm: this.props.showWatermark ?? true,
+      wm: this.wmUrl('C9177C', '0.05'),
+      wmLight: this.wmUrl('F5C6DD', '0.06'),
+      tagText: this.props.collectionTag ?? 'Nova Coleção',
+      headerShadow: this.state.scrolled ? '0 6px 24px rgba(201,23,124,.12)' : '0 1px 0 rgba(245,198,221,.0)',
+      waMain: this.waHref('a nova coleção Pink Aura'),
+      categories,
+      products,
+      modalOpen: !!mp,
+      m,
+    };
+  }
+}
+</script>
+</body>
+</html>
