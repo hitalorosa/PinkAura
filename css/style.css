@@ -144,6 +144,16 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   background: linear-gradient(125deg, #FDF0F5 0%, #FFFFFF 62%);
 }
 
+/* Watermark "PINK aura" repetido — só no hero */
+.hero-watermark {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='380' height='175'%3E%3Ctext x='6' y='76' font-family='Georgia,serif' font-size='58' font-weight='700' fill='%23C9177C' fill-opacity='0.05'%3EPINK%3C/text%3E%3Ctext x='40' y='140' font-family='cursive' font-size='66' font-style='italic' fill='%23C9177C' fill-opacity='0.05'%3Eaura%3C/text%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 380px 175px;
+}
+
 /* Aura radial decorativa */
 .hero-aura {
   position: absolute;
