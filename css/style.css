@@ -172,8 +172,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   position: relative;
   max-width: 1240px;
   margin: 0 auto;
-  padding-bottom: 96px;
-  padding: 0 26px;
+  padding: 0 26px 96px;
   min-height: 600px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
@@ -308,7 +307,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 /* =========================================
    CATÁLOGO
    ========================================= */
-.catalogo { position: relative; background: linear-gradient(180deg, #F7D2E4 0px, #FBE3EF 46px, #FDF0F5 130px, #FFFFFF 300px); padding: 72px 0 90px; }
+.catalogo { position: relative; background: linear-gradient(to bottom, #F7D2E4 0%, #FBE3EF 8%, #FDF0F5 24%, #FFFFFF 56%); padding: 72px 0 90px; }
 
 .catalogo-header { position: relative; text-align: center; margin-bottom: 40px; }
 .catalogo-sparkles { display: block; font-size: 22px; letter-spacing: 9px; color: #EF8BBF; margin-bottom: 2px; }
