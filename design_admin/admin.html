@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pink Aura — Painel Administrativo</title>
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Dancing+Script:wght@700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -20,7 +20,7 @@
 <div id="login-screen" role="dialog" aria-modal="true" aria-labelledby="login-heading">
   <div class="login-card">
     <div class="login-brand">
-      <img src="images/lily.png" alt="" aria-hidden="true">
+      <img src="assets/lily.png" alt="" aria-hidden="true">
       <span class="brand-word">
         <span class="b-pink">Pink</span><span class="b-aura">Aura</span>
       </span>
@@ -60,9 +60,10 @@
   <!-- Sidebar (desktop) -->
   <aside class="admin-sidebar">
     <div class="s-brand">
-      <img src="images/lily.png" alt="" aria-hidden="true">
+      <img src="assets/lily.png" alt="" aria-hidden="true">
       <span class="brand-word"><span class="b-pink">Pink</span><span class="b-aura">Aura</span></span>
     </div>
+    <!-- a nav é compartilhada; ver .admin-nav abaixo -->
     <nav class="admin-nav admin-nav--desktop" role="navigation" aria-label="Menu admin">
       <button type="button" class="tab-btn" data-tab="produtos" aria-current="page">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 7 12 3 4 7m16 0-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
@@ -78,13 +79,9 @@
       </button>
     </nav>
     <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px;padding-top:18px">
-      <button type="button" id="btn-ver-loja-desk" class="tab-btn">
+      <button type="button" id="btn-ver-loja-desk" class="tab-btn" onclick="document.getElementById('btn-ver-loja').click()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14 21 3"/></svg>
         <span>Ver a loja</span>
-      </button>
-      <button type="button" id="btn-logout-desk" class="tab-btn" style="color:#e57373">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-        <span>Sair</span>
       </button>
     </div>
   </aside>
@@ -92,7 +89,7 @@
   <!-- Header (mobile) -->
   <header class="admin-header">
     <div class="h-brand">
-      <img src="images/lily.png" alt="" aria-hidden="true">
+      <img src="assets/lily.png" alt="" aria-hidden="true">
       <span class="brand-word"><span class="b-pink">Pink</span><span class="b-aura">Aura</span></span>
     </div>
     <div class="h-actions">
@@ -138,13 +135,11 @@
             <div class="field">
               <label for="prod-category">Categoria</label>
               <select id="prod-category" name="prod-category">
-                <option value="">Selecione…</option>
                 <option value="Vestidos">Vestidos</option>
                 <option value="Blusas">Blusas</option>
                 <option value="Saias">Saias</option>
                 <option value="Calças">Calças</option>
                 <option value="Conjuntos">Conjuntos</option>
-                <option value="Acessórios">Acessórios</option>
                 <option value="__outra">Outra…</option>
               </select>
             </div>
@@ -153,8 +148,8 @@
               <input type="text" id="prod-category-custom" name="prod-category-custom" placeholder="Digite a categoria">
             </div>
             <div class="field">
-              <label for="prod-price">Preço</label>
-              <input type="text" id="prod-price" name="prod-price" inputmode="decimal" placeholder="R$ 0,00">
+              <label for="prod-price">Preço (R$)</label>
+              <input type="number" id="prod-price" name="prod-price" inputmode="decimal" step="0.01" min="0" placeholder="0,00">
             </div>
             <div class="field span-2">
               <label for="prod-description">Descrição</label>
@@ -175,12 +170,12 @@
             <legend class="visually-hidden">Tamanhos disponíveis</legend>
             <div class="sizes-grid">
               <span class="size-option"><input type="checkbox" class="size-checkbox" id="size-pp" value="PP"><label for="size-pp">PP</label></span>
-              <span class="size-option"><input type="checkbox" class="size-checkbox" id="size-p"  value="P"><label for="size-p">P</label></span>
-              <span class="size-option"><input type="checkbox" class="size-checkbox" id="size-m"  value="M"><label for="size-m">M</label></span>
-              <span class="size-option"><input type="checkbox" class="size-checkbox" id="size-g"  value="G"><label for="size-g">G</label></span>
+              <span class="size-option"><input type="checkbox" class="size-checkbox" id="size-p" value="P"><label for="size-p">P</label></span>
+              <span class="size-option"><input type="checkbox" class="size-checkbox" id="size-m" value="M"><label for="size-m">M</label></span>
+              <span class="size-option"><input type="checkbox" class="size-checkbox" id="size-g" value="G"><label for="size-g">G</label></span>
               <span class="size-option"><input type="checkbox" class="size-checkbox" id="size-gg" value="GG"><label for="size-gg">GG</label></span>
               <span class="size-option"><input type="checkbox" class="size-checkbox" id="size-xg" value="XG"><label for="size-xg">XG</label></span>
-              <span class="size-option"><input type="checkbox" class="size-checkbox" id="size-u"  value="U"><label for="size-u">Único</label></span>
+              <span class="size-option"><input type="checkbox" class="size-checkbox" id="size-u" value="U"><label for="size-u">Único</label></span>
             </div>
           </fieldset>
           <div class="field" style="margin-top:14px">
@@ -315,7 +310,7 @@
       <h2>Pré-visualização</h2>
       <button type="button" id="btn-fechar-preview" aria-label="Fechar pré-visualização">&times;</button>
     </div>
-    <div id="preview-body"><!-- injetado via JS --></div>
+    <!-- conteúdo do preview injetado via JS -->
   </div>
 </div>
 
@@ -330,7 +325,6 @@
   <span class="toast-bar" aria-hidden="true"></span>
 </div>
 
-<script src="js/products.js"></script>
 <script src="js/admin.js"></script>
 </body>
 </html>
