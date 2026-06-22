@@ -558,7 +558,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 .swatch-mais { font-size: .7rem; color: #B08AA0; font-weight: 500; }
 
 /* Tamanhos */
-.card-tamanhos { display: flex; flex-wrap: wrap; gap: 5px; margin-left: auto; }
+.card-tamanhos { display: flex; flex-wrap: wrap; gap: 5px; margin-left: auto; margin-top: 8px; }
 .pill-tamanho-mini {
   font-size: 10.5px;
   font-weight: 600;
@@ -774,7 +774,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   cursor: pointer;
   box-shadow: 0 8px 22px rgba(201,23,124,.32);
   transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-  margin-top: auto;
+  margin-top: 24px;
 }
 .btn-adicionar-carrinho:hover {
   background: #A20F62;
