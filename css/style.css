@@ -444,6 +444,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top center;
   transition: transform .4s ease;
 }
 .card-produto:hover .card-foto { transform: scale(1.04); }
@@ -629,6 +630,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   width: 100%;
   aspect-ratio: 3/4;
   object-fit: cover;
+  object-position: top center;
   border-radius: 14px;
   background: linear-gradient(150deg, #FDEFF5 0%, #F5C6DD 52%, #EF8BBF 100%);
 }
@@ -941,7 +943,12 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   }
   @keyframes sheetUpMobile { from{transform:translateY(100%)} to{transform:translateY(0)} }
   .modal-overlay { align-items: flex-end; padding: 0; }
-  .modal-foto-principal { aspect-ratio: 4/3; }
+  .modal-foto-principal {
+    aspect-ratio: unset;
+    height: 46vw;
+    max-height: 280px;
+    border-radius: 12px 12px 0 0;
+  }
   .modal-conteudo { padding: 20px 20px 32px; }
   .modal-nome { font-size: 24px; }
 }
