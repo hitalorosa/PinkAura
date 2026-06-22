@@ -525,6 +525,37 @@ textarea:focus {
 #cat-custom-field { display: none; }
 #cat-custom-field.is-active { display: block; }
 
+.price-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.price-pair label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--vinho);
+  margin-bottom: 6px;
+  letter-spacing: .03em;
+}
+.price-pair input {
+  width: 100%;
+  height: 44px;
+  border: 1.5px solid var(--campo-bd);
+  border-radius: 10px;
+  padding: 0 14px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--vinho);
+  background: #fff;
+  outline: none;
+  transition: border-color .18s;
+}
+.price-pair input:focus { border-color: var(--magenta); }
+@media (max-width: 480px) {
+  .price-pair { grid-template-columns: 1fr; }
+}
+
 /* ---- Cores dinâmicas ---- */
 #colors-list { display: flex; flex-direction: column; gap: 10px; }
 .color-row {
