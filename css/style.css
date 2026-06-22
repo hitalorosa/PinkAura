@@ -135,6 +135,35 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 .header-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(37,211,102,.42); }
 .header-whatsapp svg { width: 17px; height: 17px; flex-shrink: 0; }
 
+/* Botão carrinho no header */
+.btn-header-cart {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--vinho);
+  transition: background .18s, color .18s;
+  flex-shrink: 0;
+}
+.btn-header-cart:hover { background: var(--blush); color: var(--magenta); }
+.btn-header-cart svg { width: 22px; height: 22px; }
+.cart-badge {
+  position: absolute;
+  top: 3px; right: 3px;
+  min-width: 18px; height: 18px;
+  padding: 0 4px;
+  background: var(--magenta);
+  color: #fff;
+  font-size: 10px; font-weight: 800;
+  border-radius: 999px;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+  pointer-events: none;
+}
+
 /* =========================================
    HERO
    ========================================= */
@@ -172,8 +201,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   position: relative;
   max-width: 1240px;
   margin: 0 auto;
-  padding-bottom: 96px;
-  padding: 0 26px;
+  padding: 0 26px 96px;
   min-height: 600px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
@@ -308,7 +336,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 /* =========================================
    CATÁLOGO
    ========================================= */
-.catalogo { position: relative; background: linear-gradient(180deg, #F7D2E4 0px, #FBE3EF 46px, #FDF0F5 130px, #FFFFFF 300px); padding: 72px 0 90px; }
+.catalogo { position: relative; background: linear-gradient(to bottom, #F7D2E4 0%, #FBE3EF 8%, #FDF0F5 24%, #FFFFFF 56%); padding: 72px 0 90px; }
 
 .catalogo-header { position: relative; text-align: center; margin-bottom: 40px; }
 .catalogo-sparkles { display: block; font-size: 22px; letter-spacing: 9px; color: #EF8BBF; margin-bottom: 2px; }
@@ -479,6 +507,43 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   margin: 6px 0 0;
 }
 
+/* Grupo de preço com comparação */
+.card-preco-grupo { margin: 6px 0 0; }
+.card-preco-linha {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.card-preco-atual {
+  font-family: var(--font-body);
+  font-weight: 800;
+  color: var(--magenta);
+  font-size: 18px;
+  line-height: 1.1;
+}
+.card-preco-original {
+  display: block;
+  font-size: 12px;
+  color: #B08AA0;
+  text-decoration: line-through;
+  text-decoration-color: #C9177C55;
+  margin-top: 2px;
+}
+.price-badge {
+  display: inline-flex;
+  align-items: center;
+  background: #F0FDF4;
+  color: #166534;
+  border: 1px solid #BBF7D0;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: .3px;
+  white-space: nowrap;
+}
+
 .card-meta { display: flex; align-items: center; gap: 7px; margin-top: 13px; }
 
 /* Swatches */
@@ -611,11 +676,38 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   line-height: 1.1;
 }
 .modal-preco {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 0;
+}
+.modal-preco-atual {
   font-family: var(--font-body);
   font-weight: 800;
   color: var(--magenta);
-  font-size: 24px;
-  margin: 8px 0 0;
+  font-size: 26px;
+  line-height: 1;
+}
+.modal-preco-original {
+  font-size: 15px;
+  color: #B08AA0;
+  text-decoration: line-through;
+  text-decoration-color: #C9177C55;
+  align-self: flex-end;
+  padding-bottom: 2px;
+}
+.modal-badge-desconto {
+  display: inline-flex;
+  align-items: center;
+  background: #F0FDF4;
+  color: #166534;
+  border: 1px solid #BBF7D0;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  letter-spacing: .3px;
 }
 .modal-descricao {
   color: #8A6577;
@@ -665,25 +757,31 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 .btn-tamanho:hover { border-color: var(--magenta); color: var(--magenta); }
 .btn-tamanho.selecionado { background: var(--magenta); border-color: var(--magenta); color: #fff; }
 
-/* Botão WhatsApp modal */
-.btn-whatsapp-modal {
-  display: inline-flex;
+/* Botão Adicionar ao carrinho (modal) */
+.btn-adicionar-carrinho {
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 11px;
-  background: var(--whatsapp);
+  gap: 10px;
+  width: 100%;
+  padding: 16px 24px;
+  background: var(--magenta);
   color: #fff;
   font-weight: 700;
   font-size: 16px;
-  padding: 16px 24px;
   border-radius: 14px;
-  box-shadow: 0 12px 28px rgba(37,211,102,.34);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(201,23,124,.32);
   transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
   margin-top: auto;
-  width: 100%;
 }
-.btn-whatsapp-modal:hover { background: var(--whatsapp-dk); transform: translateY(-2px); box-shadow: 0 16px 34px rgba(37,211,102,.42); }
-.btn-whatsapp-modal svg { width: 22px; height: 22px; }
+.btn-adicionar-carrinho:hover {
+  background: #A20F62;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(201,23,124,.42);
+}
+.btn-adicionar-carrinho svg { width: 22px; height: 22px; }
 
 /* Sem resultados */
 .sem-resultados {
@@ -854,6 +952,181 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   .card-info { padding: 12px; }
   .card-nome { font-size: 17px; }
 }
+
+/* =========================================
+   CARRINHO — gaveta lateral / bottom sheet
+   ========================================= */
+.cart-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(45, 11, 26, 0.48);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .28s, visibility .28s;
+}
+.cart-overlay.aberto { opacity: 1; visibility: visible; }
+
+.cart-drawer {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  max-height: 88vh;
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(100%);
+  transition: transform .32s cubic-bezier(.32,0,.32,1);
+}
+.cart-overlay.aberto .cart-drawer { transform: translateY(0); }
+
+@media (min-width: 680px) {
+  .cart-drawer {
+    top: 0; bottom: 0; left: auto; right: 0;
+    width: 400px; max-height: none;
+    border-radius: 0;
+    transform: translateX(100%);
+  }
+  .cart-overlay.aberto .cart-drawer { transform: translateX(0); }
+}
+
+.cart-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 16px;
+  border-bottom: 1.5px solid #F0D5E2;
+  flex-shrink: 0;
+}
+.cart-titulo-grupo { display: flex; align-items: center; gap: 10px; }
+.cart-titulo {
+  font-family: var(--font-heading);
+  font-size: 22px; font-weight: 700;
+  color: var(--vinho); margin: 0;
+}
+.cart-count-pill {
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  min-width: 26px; height: 26px;
+  padding: 0 7px;
+  background: var(--magenta);
+  color: #fff;
+  font-size: 12px; font-weight: 800;
+  border-radius: 999px;
+}
+.cart-fechar {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px;
+  border-radius: 999px;
+  background: #F7E8F0;
+  color: var(--vinho);
+  transition: background .18s;
+}
+.cart-fechar:hover { background: var(--blush); }
+.cart-fechar svg { width: 18px; height: 18px; }
+
+.cart-items-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 16px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid #F5E5EE;
+  align-items: start;
+}
+.cart-item:last-child { border-bottom: none; }
+.cart-item-foto {
+  width: 72px; height: 88px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #F5E5EE;
+}
+.cart-item-nome {
+  font-size: 13.5px; font-weight: 700;
+  color: var(--vinho); margin: 0 0 3px;
+  line-height: 1.3;
+}
+.cart-item-detalhes {
+  font-size: 12px; color: #8A6577; margin: 0 0 5px;
+}
+.cart-item-preco {
+  font-size: 14px; font-weight: 800;
+  color: var(--magenta); margin: 0;
+}
+
+.cart-item-ctrl {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 8px; padding-top: 2px;
+}
+.cart-qty-wrap {
+  display: flex; align-items: center; gap: 2px;
+  border: 1.5px solid #F0D5E2;
+  border-radius: 999px; padding: 2px 3px;
+}
+.cart-qty-btn {
+  width: 28px; height: 28px;
+  border-radius: 999px;
+  background: #F7E8F0;
+  color: var(--vinho);
+  font-size: 17px; font-weight: 700; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.cart-qty-btn:hover { background: var(--blush); }
+.cart-qty {
+  min-width: 22px; text-align: center;
+  font-size: 14px; font-weight: 700; color: var(--vinho);
+}
+.cart-remove {
+  width: 28px; height: 28px;
+  border-radius: 999px;
+  color: #C4A8B4;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, color .15s;
+}
+.cart-remove:hover { background: #FFE4EF; color: #B4123A; }
+.cart-remove svg { width: 15px; height: 15px; }
+
+.cart-empty {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 8px; padding: 48px 24px;
+  text-align: center;
+}
+.cart-empty svg { width: 52px; height: 52px; color: #DCC0D0; }
+.cart-empty p { margin: 0; font-size: 14px; font-weight: 600; color: var(--vinho); }
+.cart-empty-sub { font-size: 12px !important; font-weight: 400 !important; color: #B08AA0 !important; }
+
+.cart-footer {
+  padding: 14px 20px 22px;
+  border-top: 1.5px solid #F0D5E2;
+  flex-shrink: 0;
+}
+.cart-resumo {
+  font-size: 13px; color: #8A6577;
+  text-align: center; margin: 0 0 12px;
+}
+.btn-cart-whatsapp {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; width: 100%;
+  padding: 16px;
+  background: var(--whatsapp);
+  color: #fff;
+  font-size: 15px; font-weight: 700;
+  border-radius: 14px;
+  box-shadow: 0 8px 22px rgba(37,211,102,.32);
+  transition: background .18s, transform .18s;
+}
+.btn-cart-whatsapp:hover { background: var(--whatsapp-dk); transform: translateY(-2px); }
+.btn-cart-whatsapp svg { width: 20px; height: 20px; }
 
 /* =========================================
    Reduced motion

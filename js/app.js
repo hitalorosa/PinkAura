@@ -51,6 +51,202 @@ function whatsappLinkSimples(nomeProduto) {
 }
 
 /* =============================================
+   Carrinho
+   ============================================= */
+const CART_KEY = 'pinkAura_cart';
+let cart = [];
+
+function loadCart() {
+  try { cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch { cart = []; }
+  updateCartBadge();
+}
+
+function saveCart() {
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  updateCartBadge();
+}
+
+function cartKey(produtoId, cor, tamanho) {
+  return `${produtoId}|${cor || ''}|${tamanho || ''}`;
+}
+
+function addToCart(produto, cor, tamanho) {
+  const key = cartKey(produto.id, cor, tamanho);
+  const existing = cart.find(i => i.key === key);
+  if (existing) {
+    existing.quantity++;
+  } else {
+    cart.push({
+      key,
+      productId: produto.id,
+      name: produto.name,
+      image: produto.images[0],
+      price: produto.price || null,
+      priceOriginal: produto.priceOriginal || null,
+      color: cor || null,
+      size: tamanho || null,
+      quantity: 1
+    });
+  }
+  saveCart();
+  renderCart();
+  openCart();
+}
+
+function removeCartItem(key) {
+  cart = cart.filter(i => i.key !== key);
+  saveCart();
+  renderCart();
+}
+
+function updateCartQty(key, delta) {
+  const item = cart.find(i => i.key === key);
+  if (!item) return;
+  item.quantity = Math.max(1, item.quantity + delta);
+  saveCart();
+  renderCart();
+}
+
+function updateCartBadge() {
+  const total = cart.reduce((s, i) => s + i.quantity, 0);
+  const badge = document.getElementById('cart-count-badge');
+  if (!badge) return;
+  badge.textContent = total;
+  badge.hidden = total === 0;
+}
+
+function renderCart() {
+  const wrap      = document.getElementById('cart-items-wrap');
+  const empty     = document.getElementById('cart-empty');
+  const footer    = document.getElementById('cart-footer');
+  const pill      = document.getElementById('cart-count-drawer');
+  const resumo    = document.getElementById('cart-resumo');
+  const total     = cart.reduce((s, i) => s + i.quantity, 0);
+
+  pill.textContent = total;
+
+  if (cart.length === 0) {
+    wrap.innerHTML = '';
+    empty.hidden = false;
+    footer.hidden = true;
+    return;
+  }
+
+  empty.hidden = true;
+  footer.hidden = false;
+  resumo.textContent = `${total} ${total === 1 ? 'item' : 'itens'} no carrinho`;
+
+  wrap.innerHTML = cart.map(item => {
+    const det = [item.color, item.size].filter(Boolean).join(' · ');
+    const keyEsc = item.key.replace(/'/g, "\\'");
+    return `
+      <div class="cart-item">
+        <img class="cart-item-foto" src="${item.image}" alt="${item.name}" loading="lazy">
+        <div class="cart-item-info">
+          <p class="cart-item-nome">${item.name}</p>
+          ${det ? `<p class="cart-item-detalhes">${det}</p>` : ''}
+          ${item.price ? `<p class="cart-item-preco">${item.price}</p>` : ''}
+        </div>
+        <div class="cart-item-ctrl">
+          <div class="cart-qty-wrap">
+            <button class="cart-qty-btn" onclick="updateCartQty('${keyEsc}',-1)" aria-label="Diminuir">−</button>
+            <span class="cart-qty">${item.quantity}</span>
+            <button class="cart-qty-btn" onclick="updateCartQty('${keyEsc}',1)" aria-label="Aumentar">+</button>
+          </div>
+          <button class="cart-remove" onclick="removeCartItem('${keyEsc}')" aria-label="Remover">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('cart-btn-whatsapp').href = buildWhatsAppOrderUrl();
+}
+
+function buildWhatsAppOrderUrl() {
+  let msg = `Olá! Tenho interesse nas seguintes peças da ${BRAND_NAME}:\n\n`;
+  cart.forEach((item, i) => {
+    msg += `${i + 1}. *${item.name}*`;
+    if (item.quantity > 1) msg += ` (${item.quantity}x)`;
+    msg += '\n';
+    if (item.color) msg += `   Cor: ${item.color}\n`;
+    if (item.size)  msg += `   Tamanho: ${item.size}\n`;
+    if (item.price) msg += `   Preço: ${item.price}\n`;
+    msg += '\n';
+  });
+  const total = cart.reduce((s, i) => s + i.quantity, 0);
+  msg += `Total: ${total} ${total === 1 ? 'item' : 'itens'}\n\nPoderia me passar mais informações sobre disponibilidade e entrega?`;
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+}
+
+function openCart() {
+  const overlay = document.getElementById('cart-overlay');
+  overlay.classList.add('aberto');
+  overlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('cart-fechar').focus(), 50);
+}
+
+function closeCart() {
+  const overlay = document.getElementById('cart-overlay');
+  overlay.classList.remove('aberto');
+  overlay.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+
+/* =============================================
+   Preços com comparação
+   ============================================= */
+function parsePreco(str) {
+  if (!str) return 0;
+  return parseFloat(str.replace(/[R$\s.]/g, '').replace(',', '.')) || 0;
+}
+
+function calcDesconto(preco, precoOriginal) {
+  const atual = parsePreco(preco);
+  const orig  = parsePreco(precoOriginal);
+  if (!orig || orig <= atual) return 0;
+  return Math.round((1 - atual / orig) * 100);
+}
+
+function buildPrecoCardHtml(produto) {
+  if (!produto.price) return '';
+  if (!produto.priceOriginal) {
+    return `<p class="card-preco">${produto.price}</p>`;
+  }
+  const pct = calcDesconto(produto.price, produto.priceOriginal);
+  const badge = pct > 0
+    ? `<span class="price-badge">−${pct}%</span>` : '';
+  return `
+    <div class="card-preco-grupo">
+      <div class="card-preco-linha">
+        <span class="card-preco-atual">${produto.price}</span>
+        ${badge}
+      </div>
+      <span class="card-preco-original">de ${produto.priceOriginal}</span>
+    </div>`;
+}
+
+function renderModalPreco(produto) {
+  const el = document.getElementById('modal-preco');
+  if (!produto.price) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  if (!produto.priceOriginal) {
+    el.innerHTML = `<span class="modal-preco-atual">${produto.price}</span>`;
+    return;
+  }
+  const pct = calcDesconto(produto.price, produto.priceOriginal);
+  const badge = pct > 0
+    ? `<span class="modal-badge-desconto">−${pct}%</span>` : '';
+  el.innerHTML = `
+    <span class="modal-preco-atual">${produto.price}</span>
+    ${badge}
+    <span class="modal-preco-original">de ${produto.priceOriginal}</span>`;
+}
+
+/* =============================================
    Renderizar produtos
    ============================================= */
 function renderProdutos(filtro = 'todas') {
@@ -78,8 +274,7 @@ function renderProdutos(filtro = 'todas') {
       `<span class="pill-tamanho-mini">${s}</span>`
     ).join('');
 
-    const precoHtml = produto.price
-      ? `<p class="card-preco">${produto.price}</p>` : '';
+    const precoHtml = buildPrecoCardHtml(produto);
 
     return `
       <article class="card-produto" data-id="${produto.id}"
@@ -92,14 +287,6 @@ function renderProdutos(filtro = 'todas') {
                alt="${produto.name}"
                loading="lazy">
           <span class="card-categoria">${produto.category}</span>
-          <a href="${whatsappLinkSimples(produto.name)}"
-             class="card-btn-whatsapp"
-             target="_blank"
-             rel="noopener noreferrer"
-             onclick="event.stopPropagation()"
-             aria-label="Comprar ${produto.name} via WhatsApp">
-            ${iconWA}
-          </a>
         </div>
         <div class="card-info">
           <h3 class="card-nome">${produto.name}</h3>
@@ -164,9 +351,8 @@ function abrirModal(id) {
   // Preencher info
   document.getElementById('modal-categoria').textContent = produto.category;
   document.getElementById('modal-nome').textContent      = produto.name;
-  document.getElementById('modal-preco').textContent     = produto.price || '';
   document.getElementById('modal-descricao').textContent = produto.description;
-  document.getElementById('modal-preco').style.display   = produto.price ? '' : 'none';
+  renderModalPreco(produto);
 
   // Galeria
   const fotoPrincipal = document.getElementById('modal-foto-principal');
@@ -203,9 +389,6 @@ function abrirModal(id) {
              onclick="selecionarTamanho(this, '${s}')">${s}</button>`
   ).join('');
 
-  // Link WhatsApp
-  atualizarBotaoWhatsApp();
-
   // Exibir modal
   const overlay = document.getElementById('modal');
   overlay.classList.add('aberto');
@@ -241,20 +424,12 @@ function selecionarCor(el, cor) {
   el.classList.add('selecionado');
   const imgIndex = parseInt(el.dataset.imgIndex ?? '0', 10);
   if (produtoAtualModal.images[imgIndex] !== undefined) trocarFoto(imgIndex);
-  atualizarBotaoWhatsApp();
 }
 
 function selecionarTamanho(el, tamanho) {
   tamanhoSelecionado = tamanho;
   document.querySelectorAll('.btn-tamanho').forEach(b => b.classList.remove('selecionado'));
   el.classList.add('selecionado');
-  atualizarBotaoWhatsApp();
-}
-
-function atualizarBotaoWhatsApp() {
-  if (!produtoAtualModal) return;
-  const btn = document.getElementById('modal-btn-whatsapp');
-  btn.href = buildWhatsAppLink(produtoAtualModal);
 }
 
 /* =============================================
@@ -284,17 +459,37 @@ document.addEventListener('DOMContentLoaded', () => {
   configurarFiltros();
   renderProdutos('todas');
 
+  // Carrinho — init
+  loadCart();
+  renderCart();
+
+  document.getElementById('btn-carrinho').addEventListener('click', openCart);
+  document.getElementById('cart-fechar').addEventListener('click', closeCart);
+  document.getElementById('cart-overlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeCart();
+  });
+
+  // Adicionar ao carrinho (modal)
+  document.getElementById('modal-btn-adicionar').addEventListener('click', () => {
+    if (!produtoAtualModal) return;
+    addToCart(produtoAtualModal, corSelecionada, tamanhoSelecionado);
+    fecharModal();
+  });
+
   // Fechar modal clicando no overlay
   document.getElementById('modal').addEventListener('click', e => {
     if (e.target === e.currentTarget) fecharModal();
   });
 
-  // Fechar com Escape
+  // Fechar modal ou carrinho com Escape
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') fecharModal();
+    if (e.key === 'Escape') {
+      fecharModal();
+      closeCart();
+    }
   });
 
-  // Botão fechar
+  // Botão fechar modal
   document.getElementById('modal-fechar').addEventListener('click', fecharModal);
 
   // Scroll suave do hero para o catálogo

@@ -274,6 +274,7 @@ function resetForm() {
   document.getElementById('prod-category-custom').value = '';
   document.getElementById('cat-custom-field').classList.remove('is-active');
   document.getElementById('prod-price').value           = '';
+  document.getElementById('prod-price-original').value  = '';
   document.getElementById('prod-description').value     = '';
   document.getElementById('colors-list').innerHTML      = colorRow('', '#C9177C');
   document.getElementById('images-list').innerHTML      = imageRow('');
@@ -283,7 +284,8 @@ function resetForm() {
 
 function fillForm(p) {
   document.getElementById('prod-name').value        = p.name;
-  document.getElementById('prod-price').value       = p.price || '';
+  document.getElementById('prod-price').value          = p.price         || '';
+  document.getElementById('prod-price-original').value = p.priceOriginal || '';
   document.getElementById('prod-description').value = p.description || '';
 
   const stdCats = ['Vestidos','Blusas','Calças','Saias','Conjuntos','Acessórios'];
@@ -349,8 +351,9 @@ function getFormData() {
   return {
     name:        document.getElementById('prod-name').value.trim(),
     category,
-    price:       document.getElementById('prod-price').value.trim(),
-    description: document.getElementById('prod-description').value.trim(),
+    price:         document.getElementById('prod-price').value.trim(),
+    priceOriginal: document.getElementById('prod-price-original').value.trim() || undefined,
+    description:   document.getElementById('prod-description').value.trim(),
     colors, sizes, images,
   };
 }
@@ -406,6 +409,44 @@ function compressImage(file, callback) {
 }
 
 /* =============================================
+   Helper preço com desconto
+   ============================================= */
+function parsePrecoAdmin(str) {
+  if (!str) return 0;
+  return parseFloat(str.replace(/[R$\s.]/g, '').replace(',', '.')) || 0;
+}
+
+function buildPrevPreco(data, modo) {
+  if (!data.price) return '';
+  if (!data.priceOriginal) {
+    const cls = modo === 'card' ? 'prev-card-price' : 'prev-detail-price';
+    return `<p class="${cls}">${escHtml(data.price)}</p>`;
+  }
+  const atual = parsePrecoAdmin(data.price);
+  const orig  = parsePrecoAdmin(data.priceOriginal);
+  const pct   = (orig > atual && orig > 0) ? Math.round((1 - atual / orig) * 100) : 0;
+  const badge = pct > 0
+    ? `<span style="display:inline-flex;align-items:center;background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px">−${pct}%</span>`
+    : '';
+  if (modo === 'card') {
+    return `
+      <div style="margin:4px 0">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span style="font-weight:800;color:#C9177C;font-size:16px">${escHtml(data.price)}</span>
+          ${badge}
+        </div>
+        <span style="font-size:11px;color:#B08AA0;text-decoration:line-through">de ${escHtml(data.priceOriginal)}</span>
+      </div>`;
+  }
+  return `
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:6px 0">
+      <span style="font-weight:800;color:#C9177C;font-size:22px">${escHtml(data.price)}</span>
+      ${badge}
+      <span style="font-size:13px;color:#B08AA0;text-decoration:line-through;align-self:flex-end;padding-bottom:2px">de ${escHtml(data.priceOriginal)}</span>
+    </div>`;
+}
+
+/* =============================================
    Preview do produto
    ============================================= */
 function previewProduct() {
@@ -437,7 +478,7 @@ function previewProduct() {
           </div>
           <div class="prev-card-info">
             <h3 class="prev-card-name">${escHtml(data.name)}</h3>
-            ${data.price ? `<p class="prev-card-price">${escHtml(data.price)}</p>` : ''}
+            ${buildPrevPreco(data, 'card')}
             <div class="prev-swatches">${swatchesHtml}</div>
             <div class="prev-sizes">${sizePillsCard}</div>
           </div>
@@ -448,7 +489,7 @@ function previewProduct() {
         <div class="prev-detail">
           <p class="prev-detail-cat">${escHtml(data.category || '')}</p>
           <h2 class="prev-detail-name">${escHtml(data.name)}</h2>
-          ${data.price ? `<p class="prev-detail-price">${escHtml(data.price)}</p>` : ''}
+          ${buildPrevPreco(data, 'detail')}
           ${data.description ? `<p class="prev-detail-desc">${escHtml(data.description)}</p>` : ''}
           ${data.colors.length ? `<p class="prev-section-title">Cores</p><div class="prev-detail-colors">${detailColorsHtml}</div>` : ''}
           ${data.sizes.length ? `<p class="prev-section-title">Tamanhos</p><div class="prev-detail-sizes">${detailSizesHtml}</div>` : ''}
