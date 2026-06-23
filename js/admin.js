@@ -63,8 +63,10 @@ async function showAdmin() {
   }
 
   if (!data) {
-    // Nenhuma role ainda — tentar reivindicar owner se não há nenhum
-    const { data: claimed, error: claimErr } = await supabase.rpc('claim_owner');
+    // Nenhuma role ainda — tentar reivindicar owner passando o email do usuário autenticado
+    const { data: claimed, error: claimErr } = await supabase.rpc('claim_owner', {
+      p_email: currentUser.email
+    });
     if (claimErr || !claimed) {
       showToast('Acesso não autorizado. Peça ao dono da loja para te convidar.', 'erro');
       await doLogout();
@@ -819,9 +821,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Login
   document.getElementById('login-form').addEventListener('submit', async e => {
     e.preventDefault();
-    const email = document.getElementById('login-email').value.trim();
-    const pass  = document.getElementById('login-pass').value;
-    const ok    = await doLogin(email, pass);
+    const email   = document.getElementById('login-email').value.trim();
+    const pass    = document.getElementById('login-pass').value;
+    const loginBtn = e.target.querySelector('button[type="submit"]');
+    const origText = loginBtn.textContent;
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Entrando…';
+    document.getElementById('login-error').classList.remove('is-visible');
+    const ok = await doLogin(email, pass);
+    loginBtn.disabled = false;
+    loginBtn.textContent = origText;
     if (!ok) {
       document.getElementById('login-error').classList.add('is-visible');
       document.getElementById('login-pass').focus();
