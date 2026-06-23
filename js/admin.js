@@ -53,7 +53,20 @@ async function showAdmin() {
     .select('role')
     .eq('user_id', currentUser.id)
     .single();
-  currentRole = data?.role || null;
+
+  if (!data) {
+    // Usuário autenticado mas sem role — tentar reivindicar owner se não há nenhum
+    const { data: claimed } = await supabase.rpc('claim_owner');
+    if (claimed) {
+      currentRole = 'owner';
+    } else {
+      showToast('Acesso não autorizado. Peça ao dono da loja para te convidar.', 'erro');
+      await doLogout();
+      return;
+    }
+  } else {
+    currentRole = data.role;
+  }
 
   const isOwner = currentRole === 'owner';
   document.getElementById('tab-btn-acessos').style.display     = isOwner ? '' : 'none';
@@ -84,9 +97,9 @@ async function initAuth() {
       showSetup();
     }
   } catch (err) {
-    // SQL não rodado ainda ou erro de rede — mostra setup como padrão seguro
+    // Erro de rede ou SQL não configurado — mostra login (mais seguro que setup)
     console.error('initAuth error:', err);
-    showSetup();
+    showLogin();
   }
 }
 
@@ -845,6 +858,9 @@ document.addEventListener('DOMContentLoaded', () => {
       errEl.classList.add('is-visible');
     }
   });
+
+  // "Já tem conta?" no setup → ir para login
+  document.getElementById('btn-setup-para-login').addEventListener('click', showLogin);
 
   // Voltar ao login
   document.getElementById('btn-voltar-login').addEventListener('click', showLogin);

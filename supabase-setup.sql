@@ -75,6 +75,20 @@ AS $$
   SELECT EXISTS (SELECT 1 FROM public.admin_roles WHERE role = 'owner');
 $$;
 
+CREATE OR REPLACE FUNCTION public.claim_owner()
+RETURNS BOOLEAN LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM public.admin_roles WHERE role = 'owner') THEN
+    RETURN FALSE; -- já existe dono, não pode reivindicar
+  END IF;
+  INSERT INTO public.admin_roles (user_id, email, role)
+  VALUES (auth.uid(), (SELECT email FROM auth.users WHERE id = auth.uid()), 'owner')
+  ON CONFLICT DO NOTHING;
+  RETURN TRUE;
+END;
+$$;
+
 CREATE OR REPLACE FUNCTION public.is_invited(check_email TEXT)
 RETURNS BOOLEAN LANGUAGE sql SECURITY DEFINER SET search_path = public
 AS $$
