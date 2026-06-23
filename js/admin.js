@@ -69,16 +69,23 @@ async function showAdmin() {
 // ============================================================
 
 async function initAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) {
-    currentUser = session.user;
-    await showAdmin();
-    return;
-  }
-  const { data: hasOwner } = await supabase.rpc('has_owner');
-  if (hasOwner) {
-    showLogin();
-  } else {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      currentUser = session.user;
+      await showAdmin();
+      return;
+    }
+    const { data: hasOwner, error } = await supabase.rpc('has_owner');
+    if (error) throw error;
+    if (hasOwner) {
+      showLogin();
+    } else {
+      showSetup();
+    }
+  } catch (err) {
+    // SQL não rodado ainda ou erro de rede — mostra setup como padrão seguro
+    console.error('initAuth error:', err);
     showSetup();
   }
 }
