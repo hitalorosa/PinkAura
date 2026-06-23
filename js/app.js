@@ -1,22 +1,9 @@
 /* =============================================
-   CONFIGURAÇÕES — gerenciadas pelo painel admin
+   CONFIGURAÇÕES — carregadas do Supabase
    ============================================= */
-const _cfg = JSON.parse(localStorage.getItem('pinkAura_config') || '{}');
-const WHATSAPP_NUMBER = _cfg.whatsapp  || "5511999999999";
-const BRAND_NAME      = _cfg.brandName || "Sua Marca";
-
-// Sobrescreve produtos com os salvos no painel admin
-(function () {
-  const saved = localStorage.getItem('pinkAura_products');
-  if (saved) {
-    try {
-      const arr = JSON.parse(saved);
-      if (Array.isArray(arr) && arr.length > 0) {
-        PRODUCTS.splice(0, PRODUCTS.length, ...arr);
-      }
-    } catch {}
-  }
-})();
+let WHATSAPP_NUMBER = '5511999999999';
+let BRAND_NAME      = 'Pink Aura';
+let PRODUCTS        = [];
 
 /* =============================================
    Estado interno
@@ -433,9 +420,52 @@ function selecionarTamanho(el, tamanho) {
 }
 
 /* =============================================
-   Inicialização
+   Inicialização via Supabase
    ============================================= */
-document.addEventListener('DOMContentLoaded', () => {
+async function initFromSupabase() {
+  try {
+    const [{ data: cfgRows }, { data: prodRows }] = await Promise.all([
+      supabase.from('site_config').select('key, value'),
+      supabase.from('products').select('*')
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: false }),
+    ]);
+
+    if (cfgRows) {
+      const cfg = {};
+      cfgRows.forEach(r => { cfg[r.key] = r.value; });
+      if (cfg.whatsapp)        WHATSAPP_NUMBER = cfg.whatsapp;
+      const el = (id) => document.getElementById(id);
+      if (cfg.heroTag)         { const e = el('hero-tag');         if (e) e.textContent = cfg.heroTag; }
+      if (cfg.heroTitle)       { const e = el('hero-titulo');       if (e) e.textContent = cfg.heroTitle; }
+      if (cfg.heroSubtitle)    { const e = el('hero-subtitle');     if (e) e.textContent = cfg.heroSubtitle; }
+      if (cfg.catalogTitle)    { const e = el('catalog-title');     if (e) e.textContent = cfg.catalogTitle; }
+      if (cfg.catalogSubtitle) { const e = el('catalog-subtitle'); if (e) e.textContent = cfg.catalogSubtitle; }
+      if (cfg.footerFrase)     { const e = el('footer-frase');     if (e) e.textContent = cfg.footerFrase; }
+    }
+
+    if (prodRows) {
+      PRODUCTS = prodRows.map(r => ({
+        id:            r.id,
+        name:          r.name,
+        category:      r.category,
+        price:         r.price          || '',
+        priceOriginal: r.price_original || undefined,
+        description:   r.description   || '',
+        colors:        r.colors         || [],
+        sizes:         r.sizes          || [],
+        images:        r.images         || [],
+      }));
+    }
+  } catch (err) {
+    console.error('Erro ao carregar dados:', err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // Carregar dados do Supabase antes de renderizar
+  await initFromSupabase();
+
   // Preencher nome da marca onde aparece
   document.querySelectorAll('[data-brand]').forEach(el => {
     el.textContent = BRAND_NAME;
@@ -447,14 +477,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-whatsapp-contato]').forEach(el => {
     el.href = urlContato;
   });
-
-  // Aplicar config do painel admin ao site
-  if (_cfg.heroTag)         { const el = document.getElementById('hero-tag');         if (el) el.textContent = _cfg.heroTag; }
-  if (_cfg.heroTitle)       { const el = document.getElementById('hero-titulo');       if (el) el.textContent = _cfg.heroTitle; }
-  if (_cfg.heroSubtitle)    { const el = document.getElementById('hero-subtitle');     if (el) el.textContent = _cfg.heroSubtitle; }
-  if (_cfg.catalogTitle)    { const el = document.getElementById('catalog-title');     if (el) el.textContent = _cfg.catalogTitle; }
-  if (_cfg.catalogSubtitle) { const el = document.getElementById('catalog-subtitle'); if (el) el.textContent = _cfg.catalogSubtitle; }
-  if (_cfg.footerFrase)     { const el = document.getElementById('footer-frase');     if (el) el.textContent = _cfg.footerFrase; }
 
   configurarFiltros();
   renderProdutos('todas');

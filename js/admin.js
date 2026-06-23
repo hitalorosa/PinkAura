@@ -1,81 +1,139 @@
-/* =============================================
-   PinkAura — Painel Administrativo
-   Login inicial: admin / pinkAura@2024
-   ============================================= */
+// ============================================================
+//  PinkAura — Painel Administrativo (Supabase)
+// ============================================================
 
-const ADMIN_DEFAULTS = { user: 'admin', pass: 'pinkAura@2024' };
-const SESSION_KEY    = 'pinkAura_session';
-const CONFIG_KEY     = 'pinkAura_config';
-const PRODUCTS_KEY   = 'pinkAura_products';
-const CREDS_KEY      = 'pinkAura_creds';
+let products    = [];
+let editingId   = null;
+let colorSeq    = 0;
+let imageSeq    = 0;
+let currentUser = null;
+let currentRole = null;
 
-let products  = [];
-let editingId = null;
-let colorSeq  = 0;
-let imageSeq  = 0;
+// ============================================================
+//  Auth — telas
+// ============================================================
 
-/* =============================================
-   Autenticação
-   ============================================= */
-function getCredentials() {
-  const stored = localStorage.getItem(CREDS_KEY);
-  return stored ? JSON.parse(stored) : { ...ADMIN_DEFAULTS };
+function showLogin() {
+  _hide('setup-screen'); _hide('signup-screen');
+  const s = document.getElementById('login-screen');
+  s.style.display = '';
+  document.getElementById('admin-panel').classList.remove('is-active');
+  document.getElementById('login-error').classList.remove('is-visible');
+  document.getElementById('login-invite-hint').style.display = 'none';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pass').value  = '';
+  document.getElementById('login-email').focus();
 }
 
-function isLoggedIn() {
-  const raw = localStorage.getItem(SESSION_KEY);
-  if (!raw) return false;
+function showSetup() {
+  _hide('login-screen'); _hide('signup-screen');
+  document.getElementById('setup-screen').style.display = '';
+  document.getElementById('setup-error').classList.remove('is-visible');
+  document.getElementById('setup-email').focus();
+}
+
+function showSignup(prefillEmail) {
+  _hide('login-screen'); _hide('setup-screen');
+  document.getElementById('signup-screen').style.display = '';
+  document.getElementById('signup-error').classList.remove('is-visible');
+  if (prefillEmail) document.getElementById('signup-email').value = prefillEmail;
+  document.getElementById('signup-pass').focus();
+}
+
+function _hide(id) {
+  document.getElementById(id).style.display = 'none';
+}
+
+async function showAdmin() {
+  _hide('login-screen'); _hide('setup-screen'); _hide('signup-screen');
+  if (document.getElementById('admin-panel').classList.contains('is-active')) return;
+
+  const { data } = await supabase
+    .from('admin_roles')
+    .select('role')
+    .eq('user_id', currentUser.id)
+    .single();
+  currentRole = data?.role || null;
+
+  const isOwner = currentRole === 'owner';
+  document.getElementById('tab-btn-acessos').style.display     = isOwner ? '' : 'none';
+  document.getElementById('tab-btn-acessos-mob').style.display = isOwner ? '' : 'none';
+
+  document.getElementById('admin-panel').classList.add('is-active');
+  await loadProducts();
+  switchTab('produtos');
+}
+
+// ============================================================
+//  Init auth
+// ============================================================
+
+async function initAuth() {
   try {
-    const { expires } = JSON.parse(raw);
-    return Date.now() < expires;
-  } catch { return false; }
-}
-
-function login(user, pass) {
-  const creds = getCredentials();
-  if (user === creds.user && pass === creds.pass) {
-    localStorage.setItem(SESSION_KEY, JSON.stringify({
-      expires: Date.now() + 24 * 60 * 60 * 1000
-    }));
-    return true;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      currentUser = session.user;
+      await showAdmin();
+      return;
+    }
+    const { data: hasOwner, error } = await supabase.rpc('has_owner');
+    if (error) throw error;
+    if (hasOwner) {
+      showLogin();
+    } else {
+      showSetup();
+    }
+  } catch (err) {
+    // SQL não rodado ainda ou erro de rede — mostra setup como padrão seguro
+    console.error('initAuth error:', err);
+    showSetup();
   }
-  return false;
 }
 
-function logout() {
-  localStorage.removeItem(SESSION_KEY);
+// ============================================================
+//  Login / Signup / Logout
+// ============================================================
+
+async function doLogin(email, pass) {
+  const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    const { data: invited } = await supabase.rpc('is_invited', { check_email: email });
+    if (invited) document.getElementById('login-invite-hint').style.display = '';
+    return false;
+  }
+  return true;
+}
+
+async function doSetup(email, pass) {
+  const { data, error } = await supabase.auth.signUp({ email, password: pass });
+  if (error) throw error;
+  if (!data.session) {
+    throw new Error(`Conta criada! Verifique seu e-mail (${email}) e clique no link de confirmação. Depois volte aqui para fazer login.`);
+  }
+  // session exists → onAuthStateChange SIGNED_IN → showAdmin()
+}
+
+async function doSignup(email, pass) {
+  const { data: invited } = await supabase.rpc('is_invited', { check_email: email });
+  if (!invited) throw new Error('E-mail não autorizado. Solicite ao dono da loja que envie um convite.');
+  const { data, error } = await supabase.auth.signUp({ email, password: pass });
+  if (error) throw error;
+  if (!data.session) {
+    throw new Error(`Conta criada! Verifique seu e-mail (${email}) e clique no link de confirmação. Depois faça login normalmente.`);
+  }
+}
+
+async function doLogout() {
+  await supabase.auth.signOut();
+  currentUser = null;
+  currentRole = null;
   location.reload();
 }
 
-/* =============================================
-   Telas
-   ============================================= */
-function showLogin() {
-  const panel  = document.getElementById('admin-panel');
-  const screen = document.getElementById('login-screen');
-  panel.classList.remove('is-active');
-  screen.style.display = '';
-  screen.classList.remove('is-leaving');
-  document.getElementById('login-error').classList.remove('is-visible');
-  document.getElementById('login-user').value = '';
-  document.getElementById('login-pass').value = '';
-  document.getElementById('login-user').focus();
-}
+// ============================================================
+//  Tabs
+// ============================================================
 
-function showAdmin() {
-  const loginScreen = document.getElementById('login-screen');
-  loadProducts();
-  switchTab('produtos');
-  loginScreen.classList.add('is-leaving');
-  setTimeout(() => {
-    loginScreen.style.display = 'none';
-    document.getElementById('admin-panel').classList.add('is-active');
-  }, 460);
-}
-
-/* =============================================
-   Tabs
-   ============================================= */
 function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => {
     if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page');
@@ -85,21 +143,22 @@ function switchTab(tab) {
     c.classList.toggle('is-active', c.id === `tab-${tab}`);
   });
   if (tab === 'produtos') { showList(); renderProductList(); }
-  if (tab === 'site')     loadSiteConfig();
+  if (tab === 'site')     loadSiteConfigForm();
+  if (tab === 'acessos')  loadAcessos();
   if (tab === 'senha') {
-    document.getElementById('senha-atual').value     = '';
     document.getElementById('senha-nova').value      = '';
     document.getElementById('senha-confirmar').value = '';
   }
 }
 
-/* =============================================
-   Lista vs. Formulário
-   ============================================= */
+// ============================================================
+//  Lista vs. Formulário
+// ============================================================
+
 function showList() {
-  const listView   = document.getElementById('lista-view');
-  const formSec    = document.getElementById('product-form-section');
-  const fab        = document.getElementById('fab-novo');
+  const listView = document.getElementById('lista-view');
+  const formSec  = document.getElementById('product-form-section');
+  const fab      = document.getElementById('fab-novo');
   if (listView) listView.style.display = '';
   formSec.classList.remove('is-active');
   if (fab) fab.style.display = '';
@@ -115,23 +174,45 @@ function showForm() {
   window.scrollTo(0, 0);
 }
 
-/* =============================================
-   Produtos — CRUD
-   ============================================= */
-function loadProducts() {
-  const saved = localStorage.getItem(PRODUCTS_KEY);
-  if (saved) {
-    try { products = JSON.parse(saved); return; } catch {}
-  }
-  if (typeof PRODUCTS !== 'undefined') {
-    products = JSON.parse(JSON.stringify(PRODUCTS));
-  } else {
-    products = [];
-  }
+// ============================================================
+//  Produtos — CRUD
+// ============================================================
+
+async function loadProducts() {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .order('display_order', { ascending: true })
+    .order('created_at', { ascending: false });
+  if (error) { showToast('Erro ao carregar produtos.', 'erro'); return; }
+  products = (data || []).map(dbToProduct);
 }
 
-function saveProducts() {
-  localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+function dbToProduct(row) {
+  return {
+    id:            row.id,
+    name:          row.name,
+    category:      row.category,
+    price:         row.price          || '',
+    priceOriginal: row.price_original || undefined,
+    description:   row.description   || '',
+    colors:        row.colors         || [],
+    sizes:         row.sizes          || [],
+    images:        row.images         || [],
+  };
+}
+
+function productToDb(p) {
+  return {
+    name:           p.name,
+    category:       p.category,
+    price:          p.price          || null,
+    price_original: p.priceOriginal  || null,
+    description:    p.description    || null,
+    colors:         p.colors,
+    sizes:          p.sizes,
+    images:         p.images,
+  };
 }
 
 function renderProductList() {
@@ -152,13 +233,12 @@ function renderProductList() {
   }
   container.innerHTML = products.map(p => {
     const img = p.images && p.images[0];
-    const thumbStyle = img ? `style="background-image:url('${escHtml(img)}')"` : '';
     const thumbContent = img
       ? `<img src="${escHtml(img)}" alt="${escHtml(p.name)}" onerror="this.style.display='none'">`
       : `<img src="images/lily.png" alt="" aria-hidden="true" class="lily-ph">`;
     return `
       <article class="product-row">
-        <div class="product-thumb" ${thumbStyle}>${thumbContent}</div>
+        <div class="product-thumb">${thumbContent}</div>
         <div class="product-row-info">
           <span class="p-name">${escHtml(p.name)}</span>
           <span class="p-meta">
@@ -178,7 +258,6 @@ function renderProductList() {
         </div>
       </article>`;
   }).join('');
-
   container.querySelectorAll('.btn-edit').forEach(b =>
     b.addEventListener('click', () => editProduct(b.dataset.id))
   );
@@ -187,10 +266,11 @@ function renderProductList() {
   );
 }
 
-function deleteProduct(id) {
+async function deleteProduct(id) {
   if (!confirm('Excluir este produto? Esta ação não pode ser desfeita.')) return;
+  const { error } = await supabase.from('products').delete().eq('id', id);
+  if (error) { showToast('Erro ao excluir produto.', 'erro'); return; }
   products = products.filter(p => p.id !== id);
-  saveProducts();
   renderProductList();
   showToast('Produto excluído.', 'aviso');
 }
@@ -216,7 +296,7 @@ function cancelForm() {
   showList();
 }
 
-/* ---- Geração de linhas ---- */
+// ---- Geração de linhas ----
 function colorRow(label, hex, imgIndex) {
   const idx = (imgIndex !== undefined && imgIndex !== null) ? imgIndex + 1 : 1;
   const uid = `cr${++colorSeq}`;
@@ -265,7 +345,7 @@ function imageRow(url) {
     </div>`;
 }
 
-/* ---- Reset / preenchimento ---- */
+// ---- Reset / preenchimento ----
 const STD_SIZES = ['PP','P','M','G','GG','XG','U'];
 
 function resetForm() {
@@ -283,11 +363,10 @@ function resetForm() {
 }
 
 function fillForm(p) {
-  document.getElementById('prod-name').value        = p.name;
-  document.getElementById('prod-price').value          = p.price         || '';
-  document.getElementById('prod-price-original').value = p.priceOriginal || '';
-  document.getElementById('prod-description').value = p.description || '';
-
+  document.getElementById('prod-name').value            = p.name;
+  document.getElementById('prod-price').value           = p.price         || '';
+  document.getElementById('prod-price-original').value  = p.priceOriginal || '';
+  document.getElementById('prod-description').value     = p.description   || '';
   const stdCats = ['Vestidos','Blusas','Calças','Saias','Conjuntos','Acessórios'];
   const catSel  = document.getElementById('prod-category');
   if (stdCats.includes(p.category)) {
@@ -298,16 +377,13 @@ function fillForm(p) {
     document.getElementById('cat-custom-field').classList.add('is-active');
     document.getElementById('prod-category-custom').value = p.category;
   }
-
   document.getElementById('colors-list').innerHTML =
     (p.colors || []).map(c => colorRow(c.label, c.hex, c.imageIndex)).join('');
-
   document.querySelectorAll('.size-checkbox').forEach(cb => {
     cb.checked = (p.sizes || []).includes(cb.value);
   });
   const customSizes = (p.sizes || []).filter(s => !STD_SIZES.includes(s));
   document.getElementById('custom-sizes').value = customSizes.join(', ');
-
   document.getElementById('images-list').innerHTML =
     (p.images || []).map(url => imageRow(url)).join('');
 }
@@ -328,28 +404,24 @@ function removeRow(btn, cls) {
   btn.closest(`.${cls}`).remove();
 }
 
-/* ---- Leitura do formulário ---- */
+// ---- Leitura do formulário ----
 function getFormData() {
   const catSel   = document.getElementById('prod-category').value;
   const category = catSel === '__outra'
     ? document.getElementById('prod-category-custom').value.trim()
     : catSel;
-
   const colors = Array.from(document.querySelectorAll('.color-row')).map(row => ({
     label:      (row.querySelector('.color-label input') || row.querySelector('.color-label')).value.trim(),
     hex:        row.querySelector('.color-hex').value,
     imageIndex: Math.max(0, parseInt((row.querySelector('.color-img-index input') || row.querySelector('.color-img-index')).value || '1', 10) - 1)
   })).filter(c => c.label);
-
-  const checked = Array.from(document.querySelectorAll('.size-checkbox:checked')).map(cb => cb.value);
+  const checked   = Array.from(document.querySelectorAll('.size-checkbox:checked')).map(cb => cb.value);
   const customRaw = document.getElementById('custom-sizes').value;
   const custom    = customRaw ? customRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
   const sizes     = [...STD_SIZES.filter(s => checked.includes(s)), ...custom.filter(s => !STD_SIZES.includes(s))];
-
-  const images = Array.from(document.querySelectorAll('.image-url')).map(i => i.value.trim()).filter(Boolean);
-
+  const images    = Array.from(document.querySelectorAll('.image-url')).map(i => i.value.trim()).filter(Boolean);
   return {
-    name:        document.getElementById('prod-name').value.trim(),
+    name:          document.getElementById('prod-name').value.trim(),
     category,
     price:         document.getElementById('prod-price').value.trim(),
     priceOriginal: document.getElementById('prod-price-original').value.trim() || undefined,
@@ -358,7 +430,7 @@ function getFormData() {
   };
 }
 
-function saveProduct() {
+async function saveProduct() {
   const data = getFormData();
   if (!data.name)               { showToast('Nome é obrigatório.', 'erro'); return; }
   if (!data.category)           { showToast('Categoria é obrigatória.', 'erro'); return; }
@@ -366,51 +438,75 @@ function saveProduct() {
   if (data.sizes.length === 0)  { showToast('Selecione pelo menos um tamanho.', 'erro'); return; }
   if (data.images.length === 0) { showToast('Adicione pelo menos uma imagem.', 'erro'); return; }
 
-  if (editingId) {
-    const idx = products.findIndex(p => p.id === editingId);
-    if (idx !== -1) products[idx] = { id: editingId, ...data };
-  } else {
-    products.push({ id: Date.now().toString(), ...data });
-  }
-
-  saveProducts();
-  const msg = editingId ? 'Produto atualizado!' : 'Produto adicionado!';
-  editingId = null;
-  cancelForm();
-  renderProductList();
-  showToast(msg, 'sucesso');
-}
-
-/* =============================================
-   Upload de imagem — comprime via canvas
-   ============================================= */
-function compressImage(file, callback) {
-  const img    = new Image();
-  const objUrl = URL.createObjectURL(file);
-  img.onload = () => {
-    URL.revokeObjectURL(objUrl);
-    const MAX_W = 900, MAX_H = 1200;
-    let w = img.naturalWidth, h = img.naturalHeight;
-    if (w > MAX_W || h > MAX_H) {
-      const r = Math.min(MAX_W / w, MAX_H / h);
-      w = Math.round(w * r);
-      h = Math.round(h * r);
+  const btn = document.getElementById('btn-salvar-produto');
+  btn.disabled = true;
+  btn.textContent = 'Salvando…';
+  try {
+    if (editingId) {
+      const { error } = await supabase.from('products').update(productToDb(data)).eq('id', editingId);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase.from('products').insert(productToDb(data));
+      if (error) throw error;
     }
-    const canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
-    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-    callback(canvas.toDataURL('image/jpeg', 0.82));
-  };
-  img.onerror = () => {
-    URL.revokeObjectURL(objUrl);
-    showToast('Erro ao carregar imagem.', 'erro');
-  };
-  img.src = objUrl;
+    const msg = editingId ? 'Produto atualizado!' : 'Produto adicionado!';
+    editingId = null;
+    await loadProducts();
+    cancelForm();
+    renderProductList();
+    showToast(msg, 'sucesso');
+  } catch (err) {
+    showToast('Erro ao salvar: ' + err.message, 'erro');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Salvar produto';
+  }
 }
 
-/* =============================================
-   Helper preço com desconto
-   ============================================= */
+// ============================================================
+//  Upload — Supabase Storage
+// ============================================================
+
+function compressToBlob(file) {
+  return new Promise((resolve, reject) => {
+    const img    = new Image();
+    const objUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objUrl);
+      const MAX_W = 900, MAX_H = 1200;
+      let w = img.naturalWidth, h = img.naturalHeight;
+      if (w > MAX_W || h > MAX_H) {
+        const r = Math.min(MAX_W / w, MAX_H / h);
+        w = Math.round(w * r); h = Math.round(h * r);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      canvas.toBlob(blob => {
+        if (blob) resolve(blob);
+        else reject(new Error('Falha ao comprimir imagem'));
+      }, 'image/jpeg', 0.82);
+    };
+    img.onerror = () => { URL.revokeObjectURL(objUrl); reject(new Error('Erro ao carregar imagem')); };
+    img.src = objUrl;
+  });
+}
+
+async function uploadImageToStorage(file) {
+  const blob = await compressToBlob(file);
+  const path = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`;
+  const { error } = await supabase.storage.from('product-images').upload(path, blob, {
+    contentType: 'image/jpeg', upsert: false
+  });
+  if (error) throw error;
+  const { data } = supabase.storage.from('product-images').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+// ============================================================
+//  Helper preço com desconto
+// ============================================================
+
 function parsePrecoAdmin(str) {
   if (!str) return 0;
   return parseFloat(str.replace(/[R$\s.]/g, '').replace(',', '.')) || 0;
@@ -432,27 +528,25 @@ function buildPrevPreco(data, modo) {
     return `
       <div style="margin:4px 0">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-          <span style="font-weight:800;color:#C9177C;font-size:16px">${escHtml(data.price)}</span>
-          ${badge}
+          <span style="font-weight:800;color:#C9177C;font-size:16px">${escHtml(data.price)}</span>${badge}
         </div>
         <span style="font-size:11px;color:#B08AA0;text-decoration:line-through">de ${escHtml(data.priceOriginal)}</span>
       </div>`;
   }
   return `
     <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:6px 0">
-      <span style="font-weight:800;color:#C9177C;font-size:22px">${escHtml(data.price)}</span>
-      ${badge}
+      <span style="font-weight:800;color:#C9177C;font-size:22px">${escHtml(data.price)}</span>${badge}
       <span style="font-size:13px;color:#B08AA0;text-decoration:line-through;align-self:flex-end;padding-bottom:2px">de ${escHtml(data.priceOriginal)}</span>
     </div>`;
 }
 
-/* =============================================
-   Preview do produto
-   ============================================= */
+// ============================================================
+//  Preview do produto
+// ============================================================
+
 function previewProduct() {
   const data = getFormData();
   if (!data.name) { showToast('Preencha ao menos o nome para visualizar.', 'aviso'); return; }
-
   const mainImg = data.images[0] || '';
   const swatchesHtml = data.colors.slice(0, 5).map(c =>
     `<span style="width:14px;height:14px;border-radius:50%;background:${c.hex};display:inline-block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)" title="${escHtml(c.label)}"></span>`
@@ -460,13 +554,10 @@ function previewProduct() {
   const detailColorsHtml = data.colors.map(c =>
     `<span style="width:28px;height:28px;border-radius:50%;background:${c.hex};display:inline-block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)" title="${escHtml(c.label)}"></span>`
   ).join('');
-  const detailSizesHtml = data.sizes.map(s =>
-    `<span class="prev-size-pill">${escHtml(s)}</span>`
-  ).join('');
+  const detailSizesHtml = data.sizes.map(s => `<span class="prev-size-pill">${escHtml(s)}</span>`).join('');
   const sizePillsCard = data.sizes.slice(0,5).map(s =>
     `<span style="font-size:.68rem;font-weight:600;color:#8A6577;background:#F7EEF3;padding:2px 7px;border-radius:6px">${escHtml(s)}</span>`
   ).join('');
-
   document.getElementById('preview-body').innerHTML = `
     <div class="preview-split">
       <div>
@@ -500,7 +591,6 @@ function previewProduct() {
         </div>
       </div>
     </div>`;
-
   document.getElementById('preview-overlay').classList.add('is-visible');
   document.body.style.overflow = 'hidden';
 }
@@ -510,11 +600,14 @@ function fecharPreview() {
   document.body.style.overflow = '';
 }
 
-/* =============================================
-   Configurações do Site
-   ============================================= */
-function loadSiteConfig() {
-  const cfg = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
+// ============================================================
+//  Configurações do Site
+// ============================================================
+
+async function loadSiteConfigForm() {
+  const { data } = await supabase.from('site_config').select('key, value');
+  const cfg = {};
+  (data || []).forEach(row => { cfg[row.key] = row.value; });
   document.getElementById('cfg-whatsapp').value         = cfg.whatsapp        || '5511999999999';
   document.getElementById('cfg-hero-tag').value         = cfg.heroTag         || 'Nova Coleção';
   document.getElementById('cfg-hero-title').value       = cfg.heroTitle       || 'Moda feminina com muito estilo';
@@ -524,45 +617,131 @@ function loadSiteConfig() {
   document.getElementById('cfg-footer-frase').value     = cfg.footerFrase     || 'Moda feminina com alma. Fale conosco pelo WhatsApp.';
 }
 
-function saveSiteConfig() {
-  const existing = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
-  const cfg = {
-    ...existing,
-    whatsapp:        document.getElementById('cfg-whatsapp').value.trim().replace(/\D/g, ''),
-    heroTag:         document.getElementById('cfg-hero-tag').value.trim(),
-    heroTitle:       document.getElementById('cfg-hero-title').value.trim(),
-    heroSubtitle:    document.getElementById('cfg-hero-subtitle').value.trim(),
-    catalogTitle:    document.getElementById('cfg-catalog-title').value.trim(),
-    catalogSubtitle: document.getElementById('cfg-catalog-subtitle').value.trim(),
-    footerFrase:     document.getElementById('cfg-footer-frase').value.trim(),
-  };
-  localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
-  showToast('Configurações salvas! Atualize a loja para ver as mudanças.', 'sucesso');
+async function saveSiteConfig() {
+  const updates = [
+    { key: 'whatsapp',        value: document.getElementById('cfg-whatsapp').value.trim().replace(/\D/g, '') },
+    { key: 'heroTag',         value: document.getElementById('cfg-hero-tag').value.trim() },
+    { key: 'heroTitle',       value: document.getElementById('cfg-hero-title').value.trim() },
+    { key: 'heroSubtitle',    value: document.getElementById('cfg-hero-subtitle').value.trim() },
+    { key: 'catalogTitle',    value: document.getElementById('cfg-catalog-title').value.trim() },
+    { key: 'catalogSubtitle', value: document.getElementById('cfg-catalog-subtitle').value.trim() },
+    { key: 'footerFrase',     value: document.getElementById('cfg-footer-frase').value.trim() },
+  ];
+  try {
+    for (const u of updates) {
+      const { error } = await supabase.from('site_config').upsert({ key: u.key, value: u.value }, { onConflict: 'key' });
+      if (error) throw error;
+    }
+    showToast('Configurações salvas! Atualize a loja para ver as mudanças.', 'sucesso');
+  } catch (err) {
+    showToast('Erro ao salvar: ' + err.message, 'erro');
+  }
 }
 
-/* =============================================
-   Alterar Senha
-   ============================================= */
-function changePassword() {
-  const current   = document.getElementById('senha-atual').value;
+// ============================================================
+//  Acessos (somente owner)
+// ============================================================
+
+async function loadAcessos() {
+  const [{ data: admins, error: e1 }, { data: invites, error: e2 }] = await Promise.all([
+    supabase.from('admin_roles').select('*').order('created_at'),
+    supabase.from('admin_invites').select('*').order('created_at'),
+  ]);
+  if (e1 || e2) { showToast('Erro ao carregar acessos.', 'erro'); return; }
+  renderAcessos(admins || [], invites || []);
+}
+
+function renderAcessos(admins, invites) {
+  const container = document.getElementById('acessos-lista');
+  const adminRows = admins.map(a => {
+    const isMe    = a.user_id === currentUser.id;
+    const badge   = a.role === 'owner'
+      ? '<span class="role-badge owner">Dono</span>'
+      : '<span class="role-badge admin">Admin</span>';
+    const revokeBtn = (!isMe && a.role !== 'owner')
+      ? `<button class="btn-revoke" data-uid="${escHtml(a.user_id)}" aria-label="Revogar acesso">Revogar</button>`
+      : '';
+    return `
+      <div class="acesso-row">
+        <div class="acesso-info">
+          <span class="acesso-email">${escHtml(a.email)}</span>
+          ${badge}
+          ${isMe ? '<span class="acesso-me">(você)</span>' : ''}
+        </div>
+        ${revokeBtn}
+      </div>`;
+  }).join('');
+
+  const pendingHtml = invites.length > 0 ? `
+    <div class="section-divider" style="margin-top:16px"><span>Convites pendentes</span></div>
+    ${invites.map(inv => `
+      <div class="acesso-row acesso-pending">
+        <div class="acesso-info">
+          <span class="acesso-email">${escHtml(inv.email)}</span>
+          <span class="role-badge pending">Pendente</span>
+        </div>
+        <button class="btn-revoke" data-invite-id="${escHtml(inv.id)}" aria-label="Cancelar convite">Cancelar</button>
+      </div>`).join('')}` : '';
+
+  container.innerHTML = `
+    <div class="section-divider"><span>Administradores ativos</span></div>
+    ${adminRows || '<p class="help-text" style="padding:12px 0">Nenhum administrador ainda.</p>'}
+    ${pendingHtml}`;
+
+  container.querySelectorAll('[data-uid]').forEach(btn =>
+    btn.addEventListener('click', () => revokeAdmin(btn.dataset.uid))
+  );
+  container.querySelectorAll('[data-invite-id]').forEach(btn =>
+    btn.addEventListener('click', () => cancelInvite(btn.dataset.inviteId))
+  );
+}
+
+async function inviteAdmin(email) {
+  const { error } = await supabase.from('admin_invites').insert({
+    email: email.toLowerCase(),
+    invited_by_id: currentUser.id
+  });
+  if (error) {
+    if (error.code === '23505') throw new Error('Este e-mail já tem convite pendente.');
+    throw error;
+  }
+}
+
+async function revokeAdmin(userId) {
+  if (!confirm('Revogar o acesso deste administrador?')) return;
+  const { error } = await supabase.from('admin_roles').delete().eq('user_id', userId);
+  if (error) { showToast('Erro ao revogar acesso.', 'erro'); return; }
+  await loadAcessos();
+  showToast('Acesso revogado.', 'aviso');
+}
+
+async function cancelInvite(inviteId) {
+  const { error } = await supabase.from('admin_invites').delete().eq('id', inviteId);
+  if (error) { showToast('Erro ao cancelar convite.', 'erro'); return; }
+  await loadAcessos();
+  showToast('Convite cancelado.', 'aviso');
+}
+
+// ============================================================
+//  Alterar Senha
+// ============================================================
+
+async function changePassword() {
   const nova      = document.getElementById('senha-nova').value;
   const confirmar = document.getElementById('senha-confirmar').value;
-  const creds     = getCredentials();
-
-  if (current !== creds.pass) { showToast('Senha atual incorreta.', 'erro'); return; }
-  if (nova.length < 6)        { showToast('Nova senha: mínimo 6 caracteres.', 'erro'); return; }
-  if (nova !== confirmar)     { showToast('As senhas não conferem.', 'erro'); return; }
-
-  localStorage.setItem(CREDS_KEY, JSON.stringify({ user: creds.user, pass: nova }));
-  document.getElementById('senha-atual').value     = '';
+  if (nova.length < 6)    { showToast('Nova senha: mínimo 6 caracteres.', 'erro'); return; }
+  if (nova !== confirmar) { showToast('As senhas não conferem.', 'erro'); return; }
+  const { error } = await supabase.auth.updateUser({ password: nova });
+  if (error) { showToast('Erro: ' + error.message, 'erro'); return; }
   document.getElementById('senha-nova').value      = '';
   document.getElementById('senha-confirmar').value = '';
   showToast('Senha alterada com sucesso!', 'sucesso');
 }
 
-/* =============================================
-   Toast
-   ============================================= */
+// ============================================================
+//  Toast
+// ============================================================
+
 const TOAST_ICONS = {
   sucesso: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>',
   erro:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6 6 18M6 6l12 12"/></svg>',
@@ -582,67 +761,114 @@ function showToast(msg, type) {
   toast._timer = setTimeout(() => toast.classList.remove('is-visible'), 3500);
 }
 
-/* =============================================
-   Escape HTML
-   ============================================= */
+// ============================================================
+//  Escape HTML
+// ============================================================
+
 function escHtml(str) {
   return String(str ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-/* =============================================
-   Inicialização
-   ============================================= */
+// ============================================================
+//  Inicialização
+// ============================================================
+
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* Sessão */
-  if (isLoggedIn()) {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('admin-panel').classList.add('is-active');
-    loadProducts();
-    switchTab('produtos');
-  } else {
-    showLogin();
-  }
+  // Init auth (determina qual tela mostrar)
+  initAuth();
 
-  /* Login */
-  document.getElementById('login-form').addEventListener('submit', e => {
+  // Auth state listener
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      currentUser = session.user;
+      await showAdmin();
+    } else if (event === 'SIGNED_OUT') {
+      currentUser = null;
+      currentRole = null;
+    }
+  });
+
+  // Login
+  document.getElementById('login-form').addEventListener('submit', async e => {
     e.preventDefault();
-    const user = document.getElementById('login-user').value.trim();
-    const pass = document.getElementById('login-pass').value;
-    if (login(user, pass)) {
-      showAdmin();
-    } else {
+    const email = document.getElementById('login-email').value.trim();
+    const pass  = document.getElementById('login-pass').value;
+    const ok    = await doLogin(email, pass);
+    if (!ok) {
       document.getElementById('login-error').classList.add('is-visible');
       document.getElementById('login-pass').focus();
     }
   });
 
-  /* Tabs (mobile bottom nav + desktop sidebar) */
+  // "Criar senha" link no login
+  document.getElementById('btn-ir-signup').addEventListener('click', () => {
+    const email = document.getElementById('login-email').value.trim();
+    showSignup(email);
+  });
+
+  // Setup (primeiro dono)
+  document.getElementById('setup-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = document.getElementById('setup-email').value.trim();
+    const pass  = document.getElementById('setup-pass').value;
+    const conf  = document.getElementById('setup-confirmar').value;
+    const errEl = document.getElementById('setup-error');
+    const errTx = document.getElementById('setup-error-text');
+    errEl.classList.remove('is-visible');
+    if (pass.length < 6)  { errTx.textContent = 'Use ao menos 6 caracteres.'; errEl.classList.add('is-visible'); return; }
+    if (pass !== conf)    { errTx.textContent = 'As senhas não conferem.'; errEl.classList.add('is-visible'); return; }
+    try {
+      await doSetup(email, pass);
+    } catch (err) {
+      errTx.textContent = err.message;
+      errEl.classList.add('is-visible');
+    }
+  });
+
+  // Signup (admin convidado)
+  document.getElementById('signup-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = document.getElementById('signup-email').value.trim();
+    const pass  = document.getElementById('signup-pass').value;
+    const conf  = document.getElementById('signup-confirmar').value;
+    const errEl = document.getElementById('signup-error');
+    const errTx = document.getElementById('signup-error-text');
+    errEl.classList.remove('is-visible');
+    if (pass.length < 6)  { errTx.textContent = 'Use ao menos 6 caracteres.'; errEl.classList.add('is-visible'); return; }
+    if (pass !== conf)    { errTx.textContent = 'As senhas não conferem.'; errEl.classList.add('is-visible'); return; }
+    try {
+      await doSignup(email, pass);
+    } catch (err) {
+      errTx.textContent = err.message;
+      errEl.classList.add('is-visible');
+    }
+  });
+
+  // Voltar ao login
+  document.getElementById('btn-voltar-login').addEventListener('click', showLogin);
+
+  // Tabs
   document.querySelectorAll('.tab-btn').forEach(btn =>
-    btn.addEventListener('click', () => switchTab(btn.dataset.tab))
+    btn.addEventListener('click', () => { if (btn.dataset.tab) switchTab(btn.dataset.tab); })
   );
 
-  /* Header scroll shadow */
+  // Header scroll shadow
   window.addEventListener('scroll', () => {
     const h = document.querySelector('.admin-header');
     if (h) h.classList.toggle('is-scrolled', window.scrollY > 6);
   }, { passive: true });
 
-  /* Logout / Ver loja */
-  document.getElementById('btn-logout').addEventListener('click', logout);
-  document.getElementById('btn-ver-loja').addEventListener('click', () =>
-    window.open('index.html', '_blank')
-  );
-  const logoutDesk = document.getElementById('btn-logout-desk');
-  if (logoutDesk) logoutDesk.addEventListener('click', logout);
-  const verLojaDesk = document.getElementById('btn-ver-loja-desk');
-  if (verLojaDesk) verLojaDesk.addEventListener('click', () => window.open('index.html', '_blank'));
+  // Logout / Ver loja
+  document.getElementById('btn-logout').addEventListener('click', doLogout);
+  document.getElementById('btn-ver-loja').addEventListener('click', () => window.open('index.html', '_blank'));
+  const ld = document.getElementById('btn-logout-desk');
+  const vd = document.getElementById('btn-ver-loja-desk');
+  if (ld) ld.addEventListener('click', doLogout);
+  if (vd) vd.addEventListener('click', () => window.open('index.html', '_blank'));
 
-  /* Produto */
+  // Produto
   document.getElementById('btn-novo-produto').addEventListener('click', newProduct);
   document.getElementById('btn-salvar-produto').addEventListener('click', saveProduct);
   document.getElementById('btn-cancelar-produto').addEventListener('click', cancelForm);
@@ -650,63 +876,75 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-add-image').addEventListener('click', addImage);
   document.getElementById('btn-preview-produto').addEventListener('click', previewProduct);
 
-  /* FAB */
+  // FAB
   const fab = document.getElementById('fab-novo');
   if (fab) fab.addEventListener('click', newProduct);
 
-  /* Categoria personalizada */
+  // Categoria personalizada
   document.getElementById('prod-category').addEventListener('change', function () {
     document.getElementById('cat-custom-field').classList.toggle('is-active', this.value === '__outra');
   });
 
-  /* Upload de imagem — event delegation */
-  document.getElementById('form-produto').addEventListener('change', e => {
+  // Upload de imagem → Supabase Storage
+  document.getElementById('form-produto').addEventListener('change', async e => {
     if (!e.target.classList.contains('image-file')) return;
     const file = e.target.files[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      showToast('Imagem muito grande. Máximo 5MB.', 'aviso');
-      return;
-    }
-    showToast('Carregando imagem…', 'sucesso');
+    if (file.size > 10 * 1024 * 1024) { showToast('Imagem muito grande. Máximo 10MB.', 'aviso'); return; }
+    showToast('Enviando imagem…', 'sucesso');
     const row      = e.target.closest('.image-row');
     const urlInput = row.querySelector('.image-url');
     const thumbDiv = row.querySelector('.image-thumb');
-    compressImage(file, dataUrl => {
-      urlInput.value = dataUrl;
-      thumbDiv.style.backgroundImage = `url('${dataUrl}')`;
-      thumbDiv.innerHTML = `<img src="${dataUrl}" alt="preview" style="width:100%;height:100%;object-fit:cover">`;
-      showToast('Imagem carregada!', 'sucesso');
-    });
-  });
-
-  /* Atualiza thumbnail ao digitar URL */
-  document.getElementById('form-produto').addEventListener('input', e => {
-    if (!e.target.classList.contains('image-url')) return;
-    const row      = e.target.closest('.image-row');
-    if (!row) return;
-    const thumbDiv = row.querySelector('.image-thumb');
-    const val      = e.target.value.trim();
-    if (val) {
-      thumbDiv.innerHTML = `<img src="${escHtml(val)}" alt="preview" style="width:100%;height:100%;object-fit:cover">`;
-    } else {
-      thumbDiv.innerHTML = `<img src="images/lily.png" alt="" aria-hidden="true" class="lily-ph">`;
+    try {
+      const publicUrl = await uploadImageToStorage(file);
+      urlInput.value  = publicUrl;
+      thumbDiv.innerHTML = `<img src="${publicUrl}" alt="preview" style="width:100%;height:100%;object-fit:cover">`;
+      showToast('Imagem enviada!', 'sucesso');
+    } catch (err) {
+      showToast('Erro ao enviar: ' + err.message, 'erro');
     }
   });
 
-  /* Config site */
+  // Atualiza thumbnail ao digitar URL
+  document.getElementById('form-produto').addEventListener('input', e => {
+    if (!e.target.classList.contains('image-url')) return;
+    const row = e.target.closest('.image-row');
+    if (!row) return;
+    const thumbDiv = row.querySelector('.image-thumb');
+    const val = e.target.value.trim();
+    thumbDiv.innerHTML = val
+      ? `<img src="${escHtml(val)}" alt="preview" style="width:100%;height:100%;object-fit:cover">`
+      : `<img src="images/lily.png" alt="" aria-hidden="true" class="lily-ph">`;
+  });
+
+  // Config site
   document.getElementById('form-site').addEventListener('submit', e => {
     e.preventDefault();
     saveSiteConfig();
   });
 
-  /* Senha */
+  // Senha
   document.getElementById('form-senha').addEventListener('submit', e => {
     e.preventDefault();
     changePassword();
   });
 
-  /* Preview — fechar */
+  // Convidar admin
+  document.getElementById('form-convidar').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = document.getElementById('convite-email').value.trim();
+    if (!email) { showToast('Informe um e-mail.', 'aviso'); return; }
+    try {
+      await inviteAdmin(email);
+      document.getElementById('convite-email').value = '';
+      await loadAcessos();
+      showToast('Convite registrado! Peça à pessoa para acessar o painel e criar a senha.', 'sucesso');
+    } catch (err) {
+      showToast('Erro: ' + err.message, 'erro');
+    }
+  });
+
+  // Preview — fechar
   document.getElementById('btn-fechar-preview').addEventListener('click', fecharPreview);
   document.getElementById('preview-overlay').addEventListener('click', e => {
     if (e.target === e.currentTarget) fecharPreview();
