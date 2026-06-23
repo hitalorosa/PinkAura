@@ -151,6 +151,7 @@ a { text-decoration: none; color: inherit; }
 .input-wrap input[type] { padding-left: 46px; }
 
 input[type="text"],
+input[type="email"],
 input[type="password"],
 input[type="number"],
 input[type="url"],
@@ -185,6 +186,15 @@ textarea:focus {
   outline: none;
   border-color: var(--magenta);
   box-shadow: 0 0 0 3px rgba(201,23,124,.16);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #fff inset;
+  -webkit-text-fill-color: var(--vinho);
+  border-color: var(--campo-bd);
+  transition: background-color 9999s ease-in-out 0s;
 }
 
 .btn-primary {
