@@ -11,13 +11,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Dancing+Script:wght@700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
 <!-- ============================================================
      LOGIN
      ============================================================ -->
-<div id="login-screen" role="dialog" aria-modal="true" aria-labelledby="login-heading">
+<div id="login-screen" role="dialog" aria-modal="true" aria-labelledby="login-heading" style="display:none">
   <div class="login-card">
     <div class="login-brand">
       <img src="images/lily.png" alt="" aria-hidden="true">
@@ -34,10 +35,10 @@
 
     <form id="login-form" novalidate>
       <div class="field">
-        <label for="login-user">Usuário</label>
+        <label for="login-email">E-mail</label>
         <div class="input-wrap">
-          <svg class="i-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <input type="text" id="login-user" name="login-user" autocomplete="username" placeholder="seu usuário" required>
+          <svg class="i-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+          <input type="email" id="login-email" name="login-email" autocomplete="email" placeholder="seu@email.com" required>
         </div>
       </div>
       <div class="field">
@@ -48,6 +49,101 @@
         </div>
       </div>
       <button type="submit" class="btn-primary">Entrar</button>
+      <p id="login-invite-hint" style="display:none;text-align:center;margin-top:12px;font-size:13px;color:#8A6577">
+        Primeiro acesso?
+        <button type="button" id="btn-ir-signup" style="background:none;border:none;color:#C9177C;font-weight:700;cursor:pointer;font-size:13px;padding:0">Criar senha</button>
+      </p>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
+     SETUP (primeira vez — nenhum dono cadastrado)
+     ============================================================ -->
+<div id="setup-screen" role="dialog" aria-modal="true" aria-labelledby="setup-heading" style="display:none">
+  <div class="login-card">
+    <div class="login-brand">
+      <img src="images/lily.png" alt="" aria-hidden="true">
+      <span class="brand-word"><span class="b-pink">Pink</span><span class="b-aura">Aura</span></span>
+      <h1 id="setup-heading" class="login-sub">Primeira configuração</h1>
+    </div>
+    <p style="font-size:13px;color:#8A6577;text-align:center;margin:-4px 0 16px">Crie a conta principal do painel.</p>
+
+    <div id="setup-error" class="login-error" role="alert" aria-live="assertive">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+      <span id="setup-error-text"></span>
+    </div>
+
+    <form id="setup-form" novalidate>
+      <div class="field">
+        <label for="setup-email">E-mail</label>
+        <div class="input-wrap">
+          <svg class="i-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+          <input type="email" id="setup-email" name="setup-email" autocomplete="email" placeholder="seu@email.com" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="setup-pass">Senha</label>
+        <div class="input-wrap">
+          <svg class="i-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="setup-pass" name="setup-pass" autocomplete="new-password" placeholder="mínimo 6 caracteres" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="setup-confirmar">Confirmar senha</label>
+        <div class="input-wrap">
+          <svg class="i-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="setup-confirmar" name="setup-confirmar" autocomplete="new-password" placeholder="repita a senha" required>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary">Criar conta</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
+     SIGNUP (admin convidado)
+     ============================================================ -->
+<div id="signup-screen" role="dialog" aria-modal="true" aria-labelledby="signup-heading" style="display:none">
+  <div class="login-card">
+    <div class="login-brand">
+      <img src="images/lily.png" alt="" aria-hidden="true">
+      <span class="brand-word"><span class="b-pink">Pink</span><span class="b-aura">Aura</span></span>
+      <h1 id="signup-heading" class="login-sub">Criar senha</h1>
+    </div>
+    <p style="font-size:13px;color:#8A6577;text-align:center;margin:-4px 0 16px">Você foi convidado para acessar o painel.</p>
+
+    <div id="signup-error" class="login-error" role="alert" aria-live="assertive">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+      <span id="signup-error-text"></span>
+    </div>
+
+    <form id="signup-form" novalidate>
+      <div class="field">
+        <label for="signup-email">E-mail</label>
+        <div class="input-wrap">
+          <svg class="i-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+          <input type="email" id="signup-email" name="signup-email" autocomplete="email" placeholder="seu@email.com" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="signup-pass">Senha</label>
+        <div class="input-wrap">
+          <svg class="i-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="signup-pass" name="signup-pass" autocomplete="new-password" placeholder="mínimo 6 caracteres" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="signup-confirmar">Confirmar senha</label>
+        <div class="input-wrap">
+          <svg class="i-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="signup-confirmar" name="signup-confirmar" autocomplete="new-password" placeholder="repita a senha" required>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary">Criar conta</button>
+      <p style="text-align:center;margin-top:12px;font-size:13px;color:#8A6577">
+        <button type="button" id="btn-voltar-login" style="background:none;border:none;color:#C9177C;font-weight:700;cursor:pointer;font-size:13px;padding:0">← Voltar ao login</button>
+      </p>
     </form>
   </div>
 </div>
@@ -71,6 +167,10 @@
       <button type="button" class="tab-btn" data-tab="site">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
         <span>Configurações</span>
+      </button>
+      <button type="button" class="tab-btn" id="tab-btn-acessos" data-tab="acessos" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Acessos</span>
       </button>
       <button type="button" class="tab-btn" data-tab="senha">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -268,17 +368,39 @@
       </form>
     </section>
 
+    <!-- ===== ABA ACESSOS ===== -->
+    <section id="tab-acessos" class="tab-content" role="tabpanel" aria-label="Gerenciar acessos">
+      <div class="page-head">
+        <h1>Acessos</h1>
+        <p>Gerencie quem pode acessar o painel.</p>
+      </div>
+
+      <!-- Convidar novo admin -->
+      <div class="form-card" style="margin-bottom:24px">
+        <div class="section-divider"><span>Convidar administrador</span></div>
+        <p class="help-text" style="margin:-6px 0 14px">A pessoa receberá um convite por e-mail. Ela deve criar a senha de acesso.</p>
+        <form id="form-convidar" novalidate style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+          <div class="field" style="flex:1;min-width:220px;margin:0">
+            <label for="convite-email">E-mail do novo admin</label>
+            <input type="email" id="convite-email" name="convite-email" placeholder="nome@email.com">
+          </div>
+          <button type="submit" class="btn-primary" style="width:auto;white-space:nowrap">Convidar</button>
+        </form>
+      </div>
+
+      <!-- Lista de admins e convites -->
+      <div class="form-card">
+        <div id="acessos-lista"><!-- preenchido via JS --></div>
+      </div>
+    </section>
+
     <!-- ===== ABA SENHA ===== -->
     <section id="tab-senha" class="tab-content" role="tabpanel" aria-label="Alterar senha">
       <div class="page-head">
         <h1>Alterar senha</h1>
-        <p>Atualize a senha de acesso ao painel.</p>
+        <p>Defina uma nova senha para sua conta.</p>
       </div>
       <form id="form-senha" class="stack-form" novalidate>
-        <div class="field">
-          <label for="senha-atual">Senha atual</label>
-          <input type="password" id="senha-atual" name="senha-atual" autocomplete="current-password">
-        </div>
         <div class="field">
           <label for="senha-nova">Nova senha</label>
           <input type="password" id="senha-nova" name="senha-nova" autocomplete="new-password">
@@ -303,6 +425,10 @@
     <button type="button" class="tab-btn" data-tab="site">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
       <span>Config.</span>
+    </button>
+    <button type="button" class="tab-btn" id="tab-btn-acessos-mob" data-tab="acessos" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Acessos</span>
     </button>
     <button type="button" class="tab-btn" data-tab="senha">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -340,7 +466,7 @@
   <span class="toast-bar" aria-hidden="true"></span>
 </div>
 
-<script src="js/products.js"></script>
+<script src="js/supabase-client.js"></script>
 <script src="js/admin.js"></script>
 </body>
 </html>

@@ -920,6 +920,63 @@ textarea:focus {
   border-radius: 12px; font-weight: 700; font-size: .9rem;
 }
 
+/* ---- Setup / Signup screens ---- */
+#setup-screen,
+#signup-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(120% 90% at 85% 8%, rgba(245,198,221,.55), transparent 55%),
+    linear-gradient(140deg, #FDF0F5 0%, #FFFFFF 55%, #FBE7F0 100%);
+}
+
+/* ---- Acessos ---- */
+.acesso-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--linha);
+}
+.acesso-row:last-child { border-bottom: none; }
+.acesso-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.acesso-email { font-size: .9rem; font-weight: 600; color: var(--vinho); }
+.acesso-me { font-size: .78rem; color: var(--taupe); }
+.acesso-pending .acesso-email { color: var(--taupe); }
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+.role-badge.owner   { background: #F3D3E2; color: var(--vinho); }
+.role-badge.admin   { background: #EEF2FF; color: #3730A3; }
+.role-badge.pending { background: #FEF9C3; color: #854D0E; }
+
+.btn-revoke {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #FBCFE8;
+  background: #FFF0F6;
+  color: var(--erro);
+  font-size: .8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.btn-revoke:hover { background: #FFE4EF; border-color: var(--erro); }
+
 /* ---- Reduced motion ---- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
