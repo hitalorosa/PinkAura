@@ -48,22 +48,29 @@ async function showAdmin() {
   _hide('login-screen'); _hide('setup-screen'); _hide('signup-screen');
   if (document.getElementById('admin-panel').classList.contains('is-active')) return;
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('admin_roles')
     .select('role')
     .eq('user_id', currentUser.id)
     .single();
 
+  // PGRST116 = nenhuma linha encontrada (esperado para novo usuário)
+  // Qualquer outro erro é falha real de rede/RLS
+  if (error && error.code !== 'PGRST116') {
+    showToast('Erro de conexão com o banco. Tente novamente.', 'erro');
+    await doLogout();
+    return;
+  }
+
   if (!data) {
-    // Usuário autenticado mas sem role — tentar reivindicar owner se não há nenhum
-    const { data: claimed } = await supabase.rpc('claim_owner');
-    if (claimed) {
-      currentRole = 'owner';
-    } else {
+    // Nenhuma role ainda — tentar reivindicar owner se não há nenhum
+    const { data: claimed, error: claimErr } = await supabase.rpc('claim_owner');
+    if (claimErr || !claimed) {
       showToast('Acesso não autorizado. Peça ao dono da loja para te convidar.', 'erro');
       await doLogout();
       return;
     }
+    currentRole = 'owner';
   } else {
     currentRole = data.role;
   }
@@ -71,6 +78,12 @@ async function showAdmin() {
   const isOwner = currentRole === 'owner';
   document.getElementById('tab-btn-acessos').style.display     = isOwner ? '' : 'none';
   document.getElementById('tab-btn-acessos-mob').style.display = isOwner ? '' : 'none';
+
+  // Exibir email do usuário logado na sidebar
+  const emailEl = document.getElementById('admin-user-email');
+  const roleEl  = document.getElementById('admin-user-role');
+  if (emailEl) emailEl.textContent = currentUser.email;
+  if (roleEl)  roleEl.textContent  = isOwner ? 'Dono' : 'Administrador';
 
   document.getElementById('admin-panel').classList.add('is-active');
   await loadProducts();

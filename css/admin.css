@@ -987,6 +987,38 @@ input:-webkit-autofill:focus {
 }
 .btn-revoke:hover { background: #FFE4EF; border-color: var(--erro); }
 
+/* ---- Admin user info (sidebar) ---- */
+.admin-user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,.07);
+  border-radius: 10px;
+  color: var(--blush);
+  margin-bottom: 4px;
+}
+.admin-user-info svg { opacity: .7; flex-shrink: 0; }
+.admin-user-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.admin-user-email {
+  font-size: 11px;
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.admin-user-role {
+  font-size: 10px;
+  color: var(--blush);
+  opacity: .8;
+}
+
 /* ---- Reduced motion ---- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
