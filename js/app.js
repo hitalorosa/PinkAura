@@ -4,6 +4,8 @@
 let WHATSAPP_NUMBER = '5511999999999';
 let BRAND_NAME      = 'Pink Aura';
 let PRODUCTS        = [];
+let SOLD_OUT_MSG    = 'Esta peça está esgotada no momento. 💗 Fale com a gente pelo WhatsApp para saber sobre reposição!';
+let LOAD_ERROR      = false;
 
 /* =============================================
    Estado interno
@@ -37,6 +39,11 @@ function whatsappLinkSimples(nomeProduto) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 }
 
+function whatsappAvisemeLink(produto) {
+  const msg = `Olá! O produto *${produto.name}* está esgotado na vitrine. Pode me avisar quando tiver reposição? 💗`;
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+}
+
 /* =============================================
    Carrinho
    ============================================= */
@@ -58,6 +65,7 @@ function cartKey(produtoId, cor, tamanho) {
 }
 
 function addToCart(produto, cor, tamanho) {
+  if (produto.soldOut) return; // peça esgotada não pode ir ao carrinho
   const key = cartKey(produto.id, cor, tamanho);
   const existing = cart.find(i => i.key === key);
   if (existing) {
@@ -243,9 +251,17 @@ function renderProdutos(filtro = 'todas') {
     : PRODUCTS.filter(p => p.category === filtro);
 
   if (lista.length === 0) {
+    let msg;
+    if (LOAD_ERROR) {
+      msg = 'Não foi possível carregar a vitrine agora. Verifique a conexão e recarregue a página.';
+    } else if (PRODUCTS.length === 0) {
+      msg = 'Nenhuma peça cadastrada ainda. Volte em breve! 💗';
+    } else {
+      msg = 'Nenhuma peça encontrada nessa categoria.';
+    }
     grade.innerHTML = `
       <div class="sem-resultados" role="status">
-        <p>Nenhuma peça encontrada nessa categoria.</p>
+        <p>${msg}</p>
       </div>`;
     return;
   }
@@ -262,18 +278,20 @@ function renderProdutos(filtro = 'todas') {
     ).join('');
 
     const precoHtml = buildPrecoCardHtml(produto);
+    const esgotado  = produto.soldOut === true;
 
     return `
-      <article class="card-produto" data-id="${produto.id}"
+      <article class="card-produto${esgotado ? ' esgotado' : ''}" data-id="${produto.id}"
                onclick="abrirModal('${produto.id}')"
                role="button" tabindex="0"
-               aria-label="Ver detalhes: ${produto.name}">
+               aria-label="Ver detalhes: ${produto.name}${esgotado ? ' (esgotado)' : ''}">
         <div class="card-foto-wrapper">
           <img class="card-foto"
                src="${produto.images[0]}"
                alt="${produto.name}"
                loading="lazy">
           <span class="card-categoria">${produto.category}</span>
+          ${esgotado ? '<span class="card-esgotado-selo">Esgotado</span>' : ''}
         </div>
         <div class="card-info">
           <h3 class="card-nome">${produto.name}</h3>
@@ -376,6 +394,19 @@ function abrirModal(id) {
              onclick="selecionarTamanho(this, '${s}')">${s}</button>`
   ).join('');
 
+  // Estado de esgotado: mostra aviso especial e oculta o botão de compra
+  const esgotadoBox = document.getElementById('modal-esgotado');
+  const addBtn      = document.getElementById('modal-btn-adicionar');
+  if (produto.soldOut) {
+    document.getElementById('modal-esgotado-msg').textContent = SOLD_OUT_MSG;
+    document.getElementById('modal-esgotado-wa').href = whatsappAvisemeLink(produto);
+    esgotadoBox.hidden = false;
+    addBtn.style.display = 'none';
+  } else {
+    esgotadoBox.hidden = true;
+    addBtn.style.display = '';
+  }
+
   // Exibir modal
   const overlay = document.getElementById('modal');
   overlay.classList.add('aberto');
@@ -424,12 +455,14 @@ function selecionarTamanho(el, tamanho) {
    ============================================= */
 async function initFromSupabase() {
   try {
-    const [{ data: cfgRows }, { data: prodRows }] = await Promise.all([
+    const [cfgRes, prodRes] = await Promise.all([
       supabase.from('site_config').select('key, value'),
       supabase.from('products').select('*')
         .order('display_order', { ascending: true })
         .order('created_at', { ascending: false }),
     ]);
+    const { data: cfgRows } = cfgRes;
+    const { data: prodRows, error: prodErr } = prodRes;
 
     if (cfgRows) {
       const cfg = {};
@@ -442,9 +475,13 @@ async function initFromSupabase() {
       if (cfg.catalogTitle)    { const e = el('catalog-title');     if (e) e.textContent = cfg.catalogTitle; }
       if (cfg.catalogSubtitle) { const e = el('catalog-subtitle'); if (e) e.textContent = cfg.catalogSubtitle; }
       if (cfg.footerFrase)     { const e = el('footer-frase');     if (e) e.textContent = cfg.footerFrase; }
+      if (cfg.soldOutMessage)  SOLD_OUT_MSG = cfg.soldOutMessage;
     }
 
-    if (prodRows) {
+    if (prodErr) {
+      LOAD_ERROR = true;
+      console.error('Erro ao carregar produtos do Supabase:', prodErr);
+    } else if (prodRows) {
       PRODUCTS = prodRows.map(r => ({
         id:            r.id,
         name:          r.name,
@@ -455,10 +492,12 @@ async function initFromSupabase() {
         colors:        r.colors         || [],
         sizes:         r.sizes          || [],
         images:        r.images         || [],
+        soldOut:       r.sold_out === true,
       }));
     }
   } catch (err) {
-    console.error('Erro ao carregar dados:', err);
+    LOAD_ERROR = true;
+    console.error('Erro ao carregar dados do Supabase:', err);
   }
 }
 

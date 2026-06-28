@@ -281,6 +281,18 @@
               <label for="prod-description">Descrição</label>
               <textarea id="prod-description" name="prod-description" placeholder="Caimento, tecido, ocasião…"></textarea>
             </div>
+            <div class="field span-2">
+              <label class="toggle-row" for="prod-sold-out">
+                <span class="toggle-switch">
+                  <input type="checkbox" id="prod-sold-out" name="prod-sold-out">
+                  <span class="toggle-track" aria-hidden="true"></span>
+                </span>
+                <span class="toggle-text">
+                  <strong>Marcar como esgotado</strong>
+                  <span class="field-hint">Exibe o selo “Esgotado” na vitrine e desativa o botão de compra com a mensagem especial.</span>
+                </span>
+              </label>
+            </div>
           </div>
 
           <div class="section-divider"><span>Cores</span></div>
@@ -373,6 +385,13 @@
         <div class="field">
           <label for="cfg-footer-frase">Frase do rodapé</label>
           <input type="text" id="cfg-footer-frase" name="cfg-footer-frase" placeholder="Cultive sua energia">
+        </div>
+
+        <div class="section-divider"><span>Produto esgotado</span></div>
+        <div class="field">
+          <label for="cfg-sold-out-msg">Mensagem de produto esgotado</label>
+          <textarea id="cfg-sold-out-msg" name="cfg-sold-out-msg" placeholder="Esta peça está esgotada no momento. 💗 Fale com a gente pelo WhatsApp para saber sobre reposição!"></textarea>
+          <p class="help-text">Aparece na loja quando uma peça está marcada como esgotada.</p>
         </div>
 
         <button type="submit" class="btn-primary" style="margin-top:8px">Salvar configurações</button>

@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS public.products (
   colors          JSONB   DEFAULT '[]'::jsonb,
   sizes           TEXT[]  DEFAULT '{}',
   images          TEXT[]  DEFAULT '{}',
+  sold_out        BOOLEAN NOT NULL DEFAULT false,
   display_order   INTEGER DEFAULT 0,
   created_at      TIMESTAMPTZ DEFAULT NOW(),
   updated_at      TIMESTAMPTZ DEFAULT NOW()
@@ -32,7 +33,8 @@ INSERT INTO public.site_config (key, value) VALUES
   ('heroSubtitle',    'Cultive sua energia'),
   ('catalogTitle',    'Nossa Vitrine'),
   ('catalogSubtitle', 'Clique em uma peça para ver detalhes'),
-  ('footerFrase',     'Moda feminina com alma. Fale conosco pelo WhatsApp.')
+  ('footerFrase',     'Moda feminina com alma. Fale conosco pelo WhatsApp.'),
+  ('soldOutMessage',  'Esta peça está esgotada no momento. 💗 Fale com a gente pelo WhatsApp para saber sobre reposição!')
 ON CONFLICT (key) DO NOTHING;
 
 -- 3. Tabela de papéis de administrador
@@ -75,7 +77,8 @@ AS $$
   SELECT EXISTS (SELECT 1 FROM public.admin_roles WHERE role = 'owner');
 $$;
 
-CREATE OR REPLACE FUNCTION public.claim_owner()
+DROP FUNCTION IF EXISTS public.claim_owner();
+CREATE OR REPLACE FUNCTION public.claim_owner(p_email TEXT)
 RETURNS BOOLEAN LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
 AS $$
 BEGIN
@@ -83,7 +86,7 @@ BEGIN
     RETURN FALSE; -- já existe dono, não pode reivindicar
   END IF;
   INSERT INTO public.admin_roles (user_id, email, role)
-  VALUES (auth.uid(), (SELECT email FROM auth.users WHERE id = auth.uid()), 'owner')
+  VALUES (auth.uid(), p_email, 'owner')
   ON CONFLICT DO NOTHING;
   RETURN TRUE;
 END;

@@ -63,8 +63,10 @@ async function showAdmin() {
   }
 
   if (!data) {
-    // Nenhuma role ainda — tentar reivindicar owner se não há nenhum
-    const { data: claimed, error: claimErr } = await supabase.rpc('claim_owner');
+    // Nenhuma role ainda — tentar reivindicar owner passando o e-mail do usuário autenticado
+    const { data: claimed, error: claimErr } = await supabase.rpc('claim_owner', {
+      p_email: currentUser.email
+    });
     if (claimErr || !claimed) {
       showToast('Acesso não autorizado. Peça ao dono da loja para te convidar.', 'erro');
       await doLogout();
@@ -225,6 +227,7 @@ function dbToProduct(row) {
     colors:        row.colors         || [],
     sizes:         row.sizes          || [],
     images:        row.images         || [],
+    soldOut:       row.sold_out === true,
   };
 }
 
@@ -238,6 +241,7 @@ function productToDb(p) {
     colors:         p.colors,
     sizes:          p.sizes,
     images:         p.images,
+    sold_out:       !!p.soldOut,
   };
 }
 
@@ -269,6 +273,7 @@ function renderProductList() {
           <span class="p-name">${escHtml(p.name)}</span>
           <span class="p-meta">
             <span class="cat-pill">${escHtml(p.category)}</span>
+            ${p.soldOut ? '<span class="sold-out-pill">Esgotado</span>' : ''}
             ${p.price ? `<span class="p-price">${escHtml(p.price)}</span>` : ''}
           </span>
         </div>
@@ -382,6 +387,7 @@ function resetForm() {
   document.getElementById('prod-price').value           = '';
   document.getElementById('prod-price-original').value  = '';
   document.getElementById('prod-description').value     = '';
+  document.getElementById('prod-sold-out').checked      = false;
   document.getElementById('colors-list').innerHTML      = colorRow('', '#C9177C');
   document.getElementById('images-list').innerHTML      = imageRow('');
   document.querySelectorAll('.size-checkbox').forEach(cb => cb.checked = false);
@@ -393,6 +399,7 @@ function fillForm(p) {
   document.getElementById('prod-price').value           = p.price         || '';
   document.getElementById('prod-price-original').value  = p.priceOriginal || '';
   document.getElementById('prod-description').value     = p.description   || '';
+  document.getElementById('prod-sold-out').checked      = p.soldOut === true;
   const stdCats = ['Vestidos','Blusas','Calças','Saias','Conjuntos','Acessórios'];
   const catSel  = document.getElementById('prod-category');
   if (stdCats.includes(p.category)) {
@@ -452,6 +459,7 @@ function getFormData() {
     price:         document.getElementById('prod-price').value.trim(),
     priceOriginal: document.getElementById('prod-price-original').value.trim() || undefined,
     description:   document.getElementById('prod-description').value.trim(),
+    soldOut:       document.getElementById('prod-sold-out').checked,
     colors, sizes, images,
   };
 }
@@ -588,10 +596,11 @@ function previewProduct() {
     <div class="preview-split">
       <div>
         <p class="preview-section-label">Card na vitrine</p>
-        <div class="prev-card">
+        <div class="prev-card${data.soldOut ? ' is-sold-out' : ''}">
           <div class="prev-card-img-wrap">
             ${mainImg ? `<img class="prev-card-img" src="${escHtml(mainImg)}" alt="${escHtml(data.name)}">` : ''}
             <span class="prev-badge">${escHtml(data.category || 'Categoria')}</span>
+            ${data.soldOut ? '<span class="prev-sold-out">Esgotado</span>' : ''}
           </div>
           <div class="prev-card-info">
             <h3 class="prev-card-name">${escHtml(data.name)}</h3>
@@ -610,10 +619,12 @@ function previewProduct() {
           ${data.description ? `<p class="prev-detail-desc">${escHtml(data.description)}</p>` : ''}
           ${data.colors.length ? `<p class="prev-section-title">Cores</p><div class="prev-detail-colors">${detailColorsHtml}</div>` : ''}
           ${data.sizes.length ? `<p class="prev-section-title">Tamanhos</p><div class="prev-detail-sizes">${detailSizesHtml}</div>` : ''}
-          <div class="prev-wa-btn">
+          ${data.soldOut
+            ? `<div class="prev-sold-out-banner">Produto esgotado — botão de compra desativado na loja</div>`
+            : `<div class="prev-wa-btn">
             <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.854L.057 23.886c-.063.252.179.487.43.418l6.188-1.625A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.028-1.381l-.36-.214-3.725.977.994-3.634-.235-.373A9.818 9.818 0 1112 21.818z"/></svg>
             Quero esse! Falar no WhatsApp
-          </div>
+          </div>`}
         </div>
       </div>
     </div>`;
@@ -641,6 +652,7 @@ async function loadSiteConfigForm() {
   document.getElementById('cfg-catalog-title').value    = cfg.catalogTitle    || 'Nossa Vitrine';
   document.getElementById('cfg-catalog-subtitle').value = cfg.catalogSubtitle || 'Clique em uma peça para ver detalhes';
   document.getElementById('cfg-footer-frase').value     = cfg.footerFrase     || 'Moda feminina com alma. Fale conosco pelo WhatsApp.';
+  document.getElementById('cfg-sold-out-msg').value     = cfg.soldOutMessage  || 'Esta peça está esgotada no momento. 💗 Fale com a gente pelo WhatsApp para saber sobre reposição!';
 }
 
 async function saveSiteConfig() {
@@ -652,6 +664,7 @@ async function saveSiteConfig() {
     { key: 'catalogTitle',    value: document.getElementById('cfg-catalog-title').value.trim() },
     { key: 'catalogSubtitle', value: document.getElementById('cfg-catalog-subtitle').value.trim() },
     { key: 'footerFrase',     value: document.getElementById('cfg-footer-frase').value.trim() },
+    { key: 'soldOutMessage',  value: document.getElementById('cfg-sold-out-msg').value.trim() },
   ];
   try {
     for (const u of updates) {
@@ -819,9 +832,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Login
   document.getElementById('login-form').addEventListener('submit', async e => {
     e.preventDefault();
-    const email = document.getElementById('login-email').value.trim();
-    const pass  = document.getElementById('login-pass').value;
-    const ok    = await doLogin(email, pass);
+    const email    = document.getElementById('login-email').value.trim();
+    const pass     = document.getElementById('login-pass').value;
+    const loginBtn = e.target.querySelector('button[type="submit"]');
+    const origText = loginBtn.textContent;
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Entrando…';
+    document.getElementById('login-error').classList.remove('is-visible');
+    const ok = await doLogin(email, pass);
+    loginBtn.disabled = false;
+    loginBtn.textContent = origText;
     if (!ok) {
       document.getElementById('login-error').classList.add('is-visible');
       document.getElementById('login-pass').focus();

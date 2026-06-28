@@ -670,6 +670,49 @@ input:-webkit-autofill:focus {
   outline-offset: 2px;
 }
 
+/* ---- Toggle Esgotado ---- */
+.toggle-row {
+  display: flex; align-items: center; gap: 14px;
+  cursor: pointer; margin: 0;
+}
+.toggle-switch { position: relative; flex-shrink: 0; width: 50px; height: 28px; }
+.toggle-switch input {
+  position: absolute; opacity: 0;
+  width: 100%; height: 100%; margin: 0; cursor: pointer;
+}
+.toggle-track {
+  position: absolute; inset: 0;
+  background: var(--campo-bd);
+  border-radius: 999px;
+  transition: background .2s;
+}
+.toggle-track::after {
+  content: ""; position: absolute;
+  top: 3px; left: 3px; width: 22px; height: 22px;
+  background: #fff; border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0,0,0,.2);
+  transition: transform .2s;
+}
+.toggle-switch input:checked + .toggle-track { background: var(--magenta); }
+.toggle-switch input:checked + .toggle-track::after { transform: translateX(22px); }
+.toggle-switch input:focus-visible + .toggle-track {
+  outline: 2px solid var(--magenta); outline-offset: 2px;
+}
+.toggle-text { display: flex; flex-direction: column; gap: 3px; }
+.toggle-text strong { font-size: 15px; color: var(--vinho); font-weight: 700; }
+.toggle-text .field-hint { font-size: 12.5px; color: var(--taupe); font-weight: 400; }
+
+/* ---- Badge "Esgotado" na lista de produtos ---- */
+.sold-out-pill {
+  display: inline-flex; align-items: center;
+  background: var(--erro-bg); color: var(--erro);
+  border: 1px solid #F1C7D2;
+  font-weight: 700; font-size: 11px;
+  letter-spacing: .4px; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 999px;
+  white-space: nowrap;
+}
+
 /* ---- Imagens ---- */
 #images-list { display: flex; flex-direction: column; gap: 10px; }
 .image-row {
@@ -896,6 +939,19 @@ input:-webkit-autofill:focus {
   background: rgba(255,255,255,.9); color: var(--magenta);
   font-size: .65rem; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
   padding: 3px 10px; border-radius: 50px;
+}
+.prev-sold-out {
+  position: absolute; top: 10px; right: 10px;
+  background: var(--vinho); color: #fff;
+  font-size: .62rem; font-weight: 800; letter-spacing: .8px; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 50px;
+}
+.prev-card.is-sold-out .prev-card-img { filter: grayscale(.55) brightness(.97); }
+.prev-sold-out-banner {
+  margin-top: 14px; padding: 12px 14px;
+  background: var(--erro-bg); border: 1.5px solid #F1C7D2;
+  border-radius: 10px; color: var(--erro);
+  font-size: .8rem; font-weight: 600; line-height: 1.5;
 }
 .prev-card-info { padding: 14px; }
 .prev-card-name { font-family: var(--font-head); font-size: 19px; font-weight: 600; color: var(--vinho); margin-bottom: 3px; }
