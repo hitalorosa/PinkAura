@@ -433,8 +433,8 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 
 .card-foto-wrapper {
   position: relative;
-  aspect-ratio: 3/4;
-  background: linear-gradient(150deg, #FDEFF5 0%, #F5C6DD 52%, #EF8BBF 100%);
+  aspect-ratio: 9 / 16;
+  background: #F7EFF4;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -443,8 +443,8 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 .card-foto {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: top center;
+  object-fit: contain; /* mostra a foto inteira, sem cortar */
+  object-position: center;
   transition: transform .4s ease;
 }
 .card-produto:hover .card-foto { transform: scale(1.04); }
@@ -628,11 +628,12 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 }
 .modal-foto-principal {
   width: 100%;
-  aspect-ratio: 3/4;
-  object-fit: cover;
-  object-position: top center;
+  aspect-ratio: 9 / 16;
+  max-height: 68vh;
+  object-fit: contain; /* foto inteira no detalhe, sem cortar */
+  object-position: center;
   border-radius: 14px;
-  background: linear-gradient(150deg, #FDEFF5 0%, #F5C6DD 52%, #EF8BBF 100%);
+  background: #F7EFF4;
 }
 .modal-thumbs {
   display: grid;
@@ -1006,9 +1007,10 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   @keyframes sheetUpMobile { from{transform:translateY(100%)} to{transform:translateY(0)} }
   .modal-overlay { align-items: flex-end; padding: 0; }
   .modal-foto-principal {
-    aspect-ratio: unset;
-    height: 46vw;
-    max-height: 280px;
+    aspect-ratio: 9 / 16;
+    height: auto;
+    max-height: none; /* mantem o 9:16: foto preenche a largura, sem barras nem corte */
+    object-fit: contain;
     border-radius: 12px 12px 0 0;
   }
   .modal-conteudo { padding: 20px 20px 32px; }
