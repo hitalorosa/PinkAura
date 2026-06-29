@@ -937,7 +937,7 @@ input:-webkit-autofill:focus {
   background: #F7EFF4;
   overflow: hidden; display: flex; align-items: center; justify-content: center;
 }
-.prev-card-img { width: 100%; height: 100%; object-fit: contain; }
+.prev-card-img { width: 100%; height: 100%; object-fit: cover; }
 .prev-badge {
   position: absolute; top: 10px; left: 10px;
   background: rgba(255,255,255,.9); color: var(--magenta);

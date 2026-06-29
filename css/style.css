@@ -443,7 +443,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 .card-foto {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* mostra a foto inteira, sem cortar */
+  object-fit: cover; /* preenche o card no formato padrao (9:16) — todos iguais */
   object-position: center;
   transition: transform .4s ease;
 }
