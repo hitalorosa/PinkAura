@@ -400,7 +400,7 @@ function fillForm(p) {
   document.getElementById('prod-price-original').value  = p.priceOriginal || '';
   document.getElementById('prod-description').value     = p.description   || '';
   document.getElementById('prod-sold-out').checked      = p.soldOut === true;
-  const stdCats = ['Vestidos','Blusas','Calças','Saias','Conjuntos','Acessórios'];
+  const stdCats = ['Vestidos','Camiseta','Cropped','Body','Moletom','Conjuntos','Saias','Calças','Acessórios'];
   const catSel  = document.getElementById('prod-category');
   if (stdCats.includes(p.category)) {
     catSel.value = p.category;
